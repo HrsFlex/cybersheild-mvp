@@ -1,8 +1,8 @@
 // TriNetra Main Application
 import api from './api.js';
 import ChronosTimeline from './chronos.js';
-import HydraAI from './hydra.js';
-import AutoSAR from './autosar.js';
+import EnhancedHydraAI from './hydra-enhanced.js';
+import EnhancedAutoSAR from './autosar-enhanced.js';
 import { showLoading, hideLoading, showNotification } from './utils.js';
 
 class TriNetraApp {
@@ -21,8 +21,8 @@ class TriNetraApp {
             
             // Initialize components
             this.chronos = new ChronosTimeline('chronos-timeline');
-            this.hydra = new HydraAI();
-            this.autosar = new AutoSAR();
+            this.hydra = new EnhancedHydraAI();
+            this.autosar = new EnhancedAutoSAR();
             
             // Setup event listeners
             this.setupEventListeners();

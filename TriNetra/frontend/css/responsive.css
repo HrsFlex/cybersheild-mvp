@@ -19,12 +19,16 @@
 
 .nav-brand h1 {
     font-size: var(--text-2xl);
-    color: var(--color-primary);
+    color: #ffffff !important;
     font-weight: var(--font-bold);
-    text-shadow: 0 0 15px var(--shadow-glow-green);
-    /* Ensure visibility with solid color instead of gradient */
-    background: none;
-    -webkit-text-fill-color: var(--color-primary);
+    text-shadow: 
+        0 0 20px rgba(0, 255, 135, 0.9),
+        0 0 35px rgba(0, 255, 135, 0.7),
+        0 0 50px rgba(0, 255, 135, 0.5),
+        2px 2px 4px rgba(0, 0, 0, 0.9);
+    /* Ensure maximum visibility with bright white text */
+    background: none !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 .nav-brand .tagline {
@@ -314,8 +318,12 @@
     
     .nav-brand h1 {
         font-size: var(--text-3xl);
-        color: var(--color-primary);
-        text-shadow: 0 0 20px var(--shadow-glow-green);
+        color: #ffffff !important;
+        text-shadow: 
+            0 0 25px rgba(0, 255, 135, 0.9),
+            0 0 40px rgba(0, 255, 135, 0.7),
+            0 0 60px rgba(0, 255, 135, 0.5),
+            2px 2px 4px rgba(0, 0, 0, 0.9);
     }
     
     .nav-brand .tagline {
@@ -412,8 +420,12 @@
     
     .nav-brand h1 {
         font-size: var(--text-4xl);
-        color: var(--color-primary);
-        text-shadow: 0 0 25px var(--shadow-glow-green);
+        color: #ffffff !important;
+        text-shadow: 
+            0 0 30px rgba(0, 255, 135, 1),
+            0 0 50px rgba(0, 255, 135, 0.8),
+            0 0 70px rgba(0, 255, 135, 0.6),
+            3px 3px 6px rgba(0, 0, 0, 1);
     }
     
     .section-header h2 {

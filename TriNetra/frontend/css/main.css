@@ -78,12 +78,16 @@ body::before {
 
 .nav-brand h1 {
     font-size: 2rem;
-    color: var(--color-primary);
+    color: #ffffff !important;
     font-weight: 700;
-    text-shadow: 0 0 10px var(--shadow-glow-green);
-    /* Ensure high contrast */
+    text-shadow: 
+        0 0 20px rgba(0, 255, 135, 0.8),
+        0 0 40px rgba(0, 255, 135, 0.6),
+        0 0 60px rgba(0, 255, 135, 0.4),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    /* Ensure high contrast with bright white text */
     background: none !important;
-    -webkit-text-fill-color: var(--color-primary) !important;
+    -webkit-text-fill-color: #ffffff !important;
     text-decoration: none;
 }
 
@@ -174,6 +178,18 @@ section:hover {
 
 .control-button:active {
     transform: translateY(0);
+}
+
+.control-button.primary {
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+    color: var(--bg-dark);
+    font-weight: 700;
+    box-shadow: 0 4px 20px var(--glow-green);
+}
+
+.control-button.primary:hover {
+    box-shadow: 0 6px 25px var(--glow-green);
+    transform: translateY(-3px);
 }
 
 /* Speed Control */

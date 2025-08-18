@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:no-hmr": "vite --config vite.config.alt.js",
+    "dev:host": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview"
   },

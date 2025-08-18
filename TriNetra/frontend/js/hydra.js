@@ -514,7 +514,7 @@ class HydraAI {
             text-align: center;
             font-weight: bold;
             z-index: 10;
-            animation: resultPop 2s ease-out forwards;
+            animation: resultPop 4s ease-out forwards;
         `;
 
         battleContainer.style.position = 'relative';
@@ -525,7 +525,7 @@ class HydraAI {
             if (resultDiv.parentNode) {
                 resultDiv.parentNode.removeChild(resultDiv);
             }
-        }, 2000);
+        }, 4000);
     }
 
     reset() {
@@ -612,8 +612,9 @@ style.textContent = `
     
     @keyframes resultPop {
         0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-        20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-        80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        25% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
     }
     
