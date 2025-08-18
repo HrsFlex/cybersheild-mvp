@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Test</title>
+    <style>
+        body { background: #0a0a0f; color: white; font-family: Arial; padding: 20px; }
+        .test { border: 1px solid #00ff87; padding: 10px; margin: 10px; }
+        .success { color: #00ff87; }
+        .error { color: #ff4757; }
+    </style>
+</head>
+<body>
+    <h1>TriNetra Frontend Test</h1>
+    
+    <div class="test">
+        <h3>CSS Test</h3>
+        <p class="success">✅ If you can see this green text, CSS is working</p>
+    </div>
+    
+    <div class="test">
+        <h3>JavaScript Test</h3>
+        <p id="js-test" class="error">❌ JavaScript not loaded</p>
+    </div>
+    
+    <div class="test">
+        <h3>Module Test</h3>
+        <p id="module-test" class="error">❌ ES6 modules not working</p>
+    </div>
+    
+    <div class="test">
+        <h3>API Test</h3>
+        <p id="api-test" class="error">❌ API connection not tested</p>
+        <button onclick="testAPI()">Test API Connection</button>
+    </div>
+
+    <script>
+        // Basic JS test
+        document.getElementById('js-test').innerHTML = '✅ JavaScript is working';
+        document.getElementById('js-test').className = 'success';
+        
+        // Module test
+        try {
+            import('./js/utils.js').then(() => {
+                document.getElementById('module-test').innerHTML = '✅ ES6 modules working';
+                document.getElementById('module-test').className = 'success';
+            }).catch(e => {
+                document.getElementById('module-test').innerHTML = '❌ Module error: ' + e.message;
+            });
+        } catch (e) {
+            document.getElementById('module-test').innerHTML = '❌ Module error: ' + e.message;
+        }
+        
+        // API test
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                if (data.status === 'healthy') {
+                    document.getElementById('api-test').innerHTML = '✅ API connection working';
+                    document.getElementById('api-test').className = 'success';
+                } else {
+                    document.getElementById('api-test').innerHTML = '❌ API unhealthy';
+                }
+            } catch (e) {
+                document.getElementById('api-test').innerHTML = '❌ API error: ' + e.message;
+            }
+        }
+    </script>
+</body>
+</html>

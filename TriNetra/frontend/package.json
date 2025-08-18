@@ -1,0 +1,20 @@
+{
+  "name": "trinetra-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^4.4.9"
+  },
+  "dependencies": {
+    "d3": "^7.8.5",
+    "chart.js": "^4.4.0",
+    "jspdf": "^2.5.1",
+    "html2canvas": "^1.4.1",
+    "jspdf-autotable": "^3.5.31"
+  }
+}
