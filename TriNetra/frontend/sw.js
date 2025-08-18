@@ -1,29 +1,14 @@
 // TriNetra PWA Service Worker
-const CACHE_NAME = 'trinetra-v1.0.0';
-const STATIC_CACHE = 'trinetra-static-v1.0.0';
-const DYNAMIC_CACHE = 'trinetra-dynamic-v1.0.0';
+const CACHE_NAME = 'trinetra-v1.0.1';
+const STATIC_CACHE = 'trinetra-static-v1.0.1';
+const DYNAMIC_CACHE = 'trinetra-dynamic-v1.0.1';
 
-// Files to cache immediately
+// Essential files to cache (reduced for Vercel deployment)
 const STATIC_FILES = [
     '/',
     '/index.html',
     '/manifest.json',
-    '/css/design-system.css',
-    '/css/main.css',
-    '/css/chronos.css',
-    '/css/components.css',
-    '/css/responsive.css',
-    '/css/animations.css',
-    '/js/main.js',
-    '/js/api.js',
-    '/js/utils.js',
-    '/js/chronos.js',
-    '/js/hydra.js',
-    '/js/autosar.js',
-    '/js/pdf-generator.js',
-    'https://d3js.org/d3.v7.min.js',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
-    'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap'
+    'https://d3js.org/d3.v7.min.js'
 ];
 
 // API endpoints to cache

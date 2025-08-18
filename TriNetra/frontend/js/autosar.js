@@ -84,10 +84,16 @@ class AutoSAR {
                 this.updateProgress('Finalizing report...', 100);
                 await this.delay(400);
                 
-                this.currentReport = response.sar_report;
-                this.renderReport(this.currentReport);
+                // Handle both response.data and direct response structures
+                this.currentReport = response.data || response.sar_report || response;
                 
-                showNotification(`SAR report ${this.currentReport.report_id} generated successfully`, 'success');
+                if (this.currentReport && (this.currentReport.report_id || this.currentReport.summary)) {
+                    this.renderReport(this.currentReport);
+                    showNotification(`SAR report ${this.currentReport.report_id || 'generated'} successfully`, 'success');
+                } else {
+                    console.error('❌ Auto-SAR: Invalid response structure:', response);
+                    throw new Error('No valid report data received from API');
+                }
             } else {
                 throw new Error(response.message || 'Failed to generate SAR report');
             }
@@ -258,7 +264,7 @@ class AutoSAR {
                     <div class="evidence-subsection">
                         <h6>Sample Transaction IDs</h6>
                         <div class="transaction-ids">
-                            ${report.evidence.transaction_ids.slice(0, 5).map(id => 
+                            ${(report.evidence.transaction_ids || []).slice(0, 5).map(id => 
                                 `<code class="transaction-id">${id}</code>`
                             ).join(' ')}
                         </div>
@@ -269,14 +275,14 @@ class AutoSAR {
                 <div class="sar-section">
                     <h5>Accounts Involved</h5>
                     <div class="accounts-grid">
-                        ${report.details.accounts_involved.slice(0, 10).map(account => 
+                        ${(report.details.accounts_involved || []).slice(0, 10).map(account => 
                             `<div class="account-item">
                                 <code>${account}</code>
                             </div>`
                         ).join('')}
                     </div>
-                    ${report.details.accounts_involved.length > 10 ? 
-                        `<div class="accounts-more">... and ${report.details.accounts_involved.length - 10} more accounts</div>` : ''
+                    ${(report.details.accounts_involved || []).length > 10 ? 
+                        `<div class="accounts-more">... and ${(report.details.accounts_involved || []).length - 10} more accounts</div>` : ''
                     }
                 </div>
 
@@ -303,7 +309,7 @@ class AutoSAR {
                 <div class="sar-recommendations">
                     <h6>Immediate Actions Required</h6>
                     <ul>
-                        ${report.recommendations.map(rec => 
+                        ${(report.recommendations || []).map(rec => 
                             `<li>${rec}</li>`
                         ).join('')}
                     </ul>
@@ -552,25 +558,25 @@ Risk Factors:
 ${report.evidence.risk_factors.map(factor => `• ${factor}`).join('\n')}
 
 Sample Transaction IDs:
-${report.evidence.transaction_ids.slice(0, 10).join(', ')}
+${(report.evidence.transaction_ids || []).slice(0, 10).join(', ')}
 
 ACCOUNTS INVOLVED
 -----------------
-${report.details.accounts_involved.slice(0, 20).join('\n')}
+${(report.details.accounts_involved || []).slice(0, 20).join('\n')}
 
 REGULATORY COMPLIANCE
 --------------------
-Regulatory Codes: ${report.regulatory_compliance.codes.join(', ')}
+Regulatory Codes: ${(report.regulatory_compliance.codes || []).join(', ')}
 Filing Deadline: ${report.regulatory_compliance.filing_deadline}
 Law Enforcement Notification: ${report.regulatory_compliance.law_enforcement_notification ? 'Required' : 'Not Required'}
 
 RECOMMENDATIONS
 --------------
-${report.recommendations.map(rec => `• ${rec}`).join('\n')}
+${(report.recommendations || []).map(rec => `• ${rec}`).join('\n')}
 
 ATTACHMENTS
 -----------
-${Object.entries(report.attachments).map(([type, filename]) => `${type}: ${filename}`).join('\n')}
+${Object.entries(report.attachments || {}).map(([type, filename]) => `${type}: ${filename}`).join('\n')}
 
 DIGITAL SIGNATURE
 -----------------

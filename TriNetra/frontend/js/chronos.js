@@ -219,7 +219,10 @@ class ChronosTimeline {
                 
                 if (this.data.length > 0) {
                     this.render();
-                    showNotification(`Loaded ${this.data.length} transactions for ${scenario}`, 'success');
+                    const notificationMessage = response.message && response.message.includes('Demo mode') 
+                        ? `Demo: Loaded ${this.data.length} sample transactions` 
+                        : `Loaded ${this.data.length} transactions for ${scenario}`;
+                    showNotification(notificationMessage, 'success');
                 } else {
                     throw new Error('No transaction data available for this scenario');
                 }
@@ -962,11 +965,17 @@ class ChronosTimeline {
         this.currentFrame = 0;
         this.selectedNode = null;
         
+        // Clear any existing visualization first
+        this.clearVisualization();
+        
+        // Always ensure proper view rendering
         if (this.viewMode === 'timeline') {
-            this.render();
-        } else {
+            this.renderTimeline();
+        } else if (this.viewMode === 'network') {
             this.renderNetwork();
         }
+        
+        console.log(`🔄 CHRONOS: Reset completed for ${this.viewMode} view`);
     }
 
     resize() {

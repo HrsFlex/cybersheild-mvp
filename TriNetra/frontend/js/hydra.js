@@ -131,10 +131,22 @@ class HydraAI {
             const response = await api.generateAdversarialPattern();
             
             if (response.status === 'success') {
-                const pattern = response.pattern;
+                const pattern = response.data || response.pattern;
                 
-                // Show pattern details
-                this.showPatternDetails(pattern);
+                // Validate pattern exists and add fallback properties if needed (for mock data compatibility)
+                if (pattern) {
+                    if (!pattern.pattern_type && pattern.attack_type) {
+                        pattern.pattern_type = pattern.attack_type;
+                    }
+                    if (!pattern.complexity_score && pattern.complexity) {
+                        pattern.complexity_score = pattern.complexity;
+                    }
+                    
+                    // Show pattern details
+                    this.showPatternDetails(pattern);
+                } else {
+                    throw new Error('No pattern data received from API');
+                }
                 
                 await this.delay(1000);
                 
@@ -150,28 +162,32 @@ class HydraAI {
                 const detectionResponse = await api.testDetection(pattern);
                 
                 if (detectionResponse.status === 'success') {
-                    const detection = detectionResponse.detection;
+                    const detection = detectionResponse.detection_result || detectionResponse.detection;
                     
-                    // Step 3: Battle result
-                    this.animateAIEntity('detector', detection.detected ? 'defending' : 'failing');
+                    if (detection) {
+                        // Step 3: Battle result
+                        this.animateAIEntity('detector', detection.detected ? 'defending' : 'failing');
                     
-                    await this.delay(500);
-                    
-                    // Update all metrics and stats
-                    this.updateMetrics(pattern, detection);
-                    this.updateBattleStats(pattern, detection);
-                    this.showBattleResult(pattern, detection);
-                    
-                    const resultMessage = detection.detected 
-                        ? `🛡️ DETECTED! Confidence: ${formatPercentage(detection.confidence)}`
-                        : `🔥 EVADED! Only ${formatPercentage(detection.confidence)} confidence`;
-                    
-                    this.updateBattleStatus(resultMessage);
-                    
-                    showNotification(
-                        `${detection.detected ? 'Attack blocked' : 'Attack succeeded'} - ${formatPercentage(detection.confidence)} confidence`,
-                        detection.detected ? 'success' : 'warning'
-                    );
+                        await this.delay(500);
+                        
+                        // Update all metrics and stats
+                        this.updateMetrics(pattern, detection);
+                        this.updateBattleStats(pattern, detection);
+                        this.showBattleResult(pattern, detection);
+                        
+                        const resultMessage = detection.detected 
+                            ? `🛡️ DETECTED! Confidence: ${formatPercentage(detection.confidence)}`
+                            : `🔥 EVADED! Only ${formatPercentage(detection.confidence)} confidence`;
+                        
+                        this.updateBattleStatus(resultMessage);
+                        
+                        showNotification(
+                            `${detection.detected ? 'Attack blocked' : 'Attack succeeded'} - ${formatPercentage(detection.confidence)} confidence`,
+                            detection.detected ? 'success' : 'warning'
+                        );
+                    } else {
+                        throw new Error('No detection result received from API');
+                    }
                 }
             } else {
                 throw new Error(response.message || 'Failed to generate pattern');

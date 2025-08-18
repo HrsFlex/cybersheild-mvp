@@ -1,0 +1,31 @@
+{
+  "buildCommand": "cd TriNetra/frontend && npm run build",
+  "outputDirectory": "TriNetra/frontend/dist",
+  "installCommand": "cd TriNetra/frontend && npm install",
+  "headers": [
+    {
+      "source": "/js/(.*).js",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*).js",
+      "headers": [
+        {
+          "key": "Content-Type", 
+          "value": "application/javascript"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api-mock.json"
+    }
+  ]
+}
