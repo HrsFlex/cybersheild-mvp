@@ -19,13 +19,13 @@ def get_timeline_data():
         
         conn = sqlite3.connect(Config.DATABASE_PATH)
         
-        # Build query based on scenario
+        # Build query based on scenario (using parameterized queries to prevent SQL injection)
         if scenario == 'all':
             query = "SELECT * FROM transactions ORDER BY timestamp"
+            df = pd.read_sql_query(query, conn)
         else:
-            query = f"SELECT * FROM transactions WHERE scenario = '{scenario}' ORDER BY timestamp"
-        
-        df = pd.read_sql_query(query, conn)
+            query = "SELECT * FROM transactions WHERE scenario = ? ORDER BY timestamp"
+            df = pd.read_sql_query(query, conn, params=[scenario])
         conn.close()
         
         # Convert to timeline format

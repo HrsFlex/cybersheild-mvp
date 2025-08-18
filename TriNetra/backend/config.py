@@ -5,4 +5,4 @@ class Config:
     DATABASE_PATH = os.path.join(os.path.dirname(__file__), 'data', 'transactions.db')
     DEBUG = True
     HOST = '0.0.0.0'
-    PORT = 5000
+    PORT = 5001

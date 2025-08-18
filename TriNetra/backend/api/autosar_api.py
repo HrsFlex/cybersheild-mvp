@@ -137,6 +137,9 @@ class AutoSARGenerator:
         """Assess overall risk factors"""
         risk_factors = []
         
+        if not transactions:
+            return ['No transaction data available']
+        
         # High suspicious score average
         avg_suspicion = sum(float(t.get('suspicious_score', 0)) for t in transactions) / len(transactions)
         if avg_suspicion > 0.7:
@@ -144,12 +147,15 @@ class AutoSARGenerator:
         
         # Large amounts
         amounts = [float(t.get('amount', 0)) for t in transactions]
-        if max(amounts) > 10000:
+        if amounts and max(amounts) > 10000:
             risk_factors.append('Large individual transaction amounts')
         
         # Frequency
         if len(transactions) > 50:
             risk_factors.append('High transaction frequency')
+        
+        if not risk_factors:
+            risk_factors.append('Standard risk profile detected')
         
         return risk_factors
     
@@ -202,12 +208,12 @@ def generate_sar():
         pattern_data = request_data.get('pattern', {})
         scenario = pattern_data.get('scenario', 'terrorist_financing')
         
-        # Get transactions for the scenario
+        # Get transactions for the scenario (using parameterized query to prevent SQL injection)
         conn = sqlite3.connect(Config.DATABASE_PATH)
-        query = f"SELECT * FROM transactions WHERE scenario = '{scenario}' AND suspicious_score > 0.5 LIMIT 50"
+        query = "SELECT * FROM transactions WHERE scenario = ? AND suspicious_score > 0.5 LIMIT 50"
         
         import pandas as pd
-        df = pd.read_sql_query(query, conn)
+        df = pd.read_sql_query(query, conn, params=[scenario])
         conn.close()
         
         transactions = df.to_dict('records')
