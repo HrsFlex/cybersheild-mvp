@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriNetra - AI-Powered Financial Crime Detection</title>
+    <meta name="description" content="Making the invisible visible - Advanced AI-powered financial crime detection and prevention platform">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#217eaa">
+    <link rel="apple-touch-icon" href="./static/icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- External Dependencies -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="https://d3js.org/d3.v7.min.js" defer></script>
+    
+    <style>
+        /* 🌐 TriNetra Modern Design System */
+        :root {
+            /* Core Color Palette from CSS file */
+            --color-light: #eeeeee;
+            --color-bg: #f2f2f3;
+            --color-accent: #8ca4ac;
+            --color-primary: #7d9cb7;
+            --color-strong: #217eaa;
+            
+            /* Dark Mode Palette */
+            --color-dark: #0a0a0a;
+            --color-dark-secondary: #1a1a1a;
+            --color-dark-tertiary: #2a2a2a;
+            --color-gray: #666666;
+            --color-gray-light: #999999;
+            --color-white: #ffffff;
+            
+            /* Status Colors */
+            --color-success: #2ed573;
+            --color-warning: #ffa502;
+            --color-error: #ff4757;
+            --color-info: #3742fa;
+            
+            /* Enhanced Colors for Dark Theme */
+            --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-strong) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-secondary) 100%);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'JetBrains Mono', 'SF Mono', Monaco, Consolas, monospace;
+            
+            /* Spacing Scale */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 32px;
+            
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+            --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.10);
+            --shadow-xl: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            
+            /* Glows */
+            --glow-primary: 0 0 20px rgba(125, 156, 183, 0.5);
+            --glow-strong: 0 0 30px rgba(33, 126, 170, 0.6);
+            --glow-accent: 0 0 25px rgba(140, 164, 172, 0.4);
+            
+            /* Transitions */
+            --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Z-Index Scale */
+            --z-base: 1;
+            --z-sticky: 10;
+            --z-modal: 100;
+            --z-overlay: 1000;
+        }
+        
+        /* Reset & Base Styles */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            background: var(--gradient-dark);
+            color: var(--color-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Dynamic Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(125, 156, 183, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 85% 75%, rgba(33, 126, 170, 0.12) 0%, transparent 60%),
+                radial-gradient(circle at 50% 50%, rgba(140, 164, 172, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite alternate;
+        }
+        
+        @keyframes backgroundShift {
+            0% { opacity: 0.8; transform: scale(1) rotate(0deg); }
+            100% { opacity: 1; transform: scale(1.1) rotate(0.5deg); }
+        }
+        
+        /* Main App Container */
+        #app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Enhanced Navigation */
+        .main-nav {
+            position: sticky;
+            top: 0;
+            z-index: var(--z-sticky);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(10, 10, 10, 0.85);
+            border-bottom: 1px solid rgba(125, 156, 183, 0.2);
+            padding: var(--space-4) var(--space-8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-normal);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .main-nav::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            opacity: 0.6;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+        
+        .nav-brand h1 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--color-light) 0%, var(--color-primary) 50%, var(--color-strong) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(var(--glow-primary));
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+        
+        .nav-brand h1::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(8px);
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .tagline {
+            color: var(--color-accent);
+            font-size: 0.9rem;
+            font-weight: 400;
+            font-style: italic;
+            opacity: 0.9;
+            letter-spacing: 0.02em;
+        }
+        
+        .nav-controls {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+        
+        .nav-button {
+            padding: var(--space-3) var(--space-5);
+            background: rgba(125, 156, 183, 0.1);
+            border: 1px solid rgba(125, 156, 183, 0.3);
+            color: var(--color-light);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0.8;
+            transition: var(--transition-normal);
+            z-index: -1;
+        }
+        
+        .nav-button:hover::before {
+            left: 0;
+        }
+        
+        .nav-button:hover {
+            color: var(--color-white);
+            border-color: var(--color-strong);
+            box-shadow: var(--glow-strong);
+            transform: translateY(-1px);
+        }
+        
+        /* Dashboard Layout */
+        .dashboard {
+            flex: 1;
+            padding: var(--space-8);
+            display: grid;
+            gap: var(--space-8);
+            grid-template-columns: 1fr;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Enhanced Sections */
+        section {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            border: 1px solid rgba(125, 156, 183, 0.15);
+            box-shadow: var(--shadow-xl);
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            opacity: 0.8;
+        }
+        
+        section:hover {
+            box-shadow: var(--shadow-xl), var(--glow-primary);
+            transform: translateY(-4px);
+            border-color: rgba(125, 156, 183, 0.3);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid rgba(125, 156, 183, 0.2);
+        }
+        
+        .section-header h2 {
+            color: var(--color-light);
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            filter: drop-shadow(var(--glow-primary));
+        }
+        
+        /* Control Groups */
+        .chronos-controls,
+        .hydra-controls,
+        .autosar-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-3);
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: rgba(125, 156, 183, 0.05);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(125, 156, 183, 0.1);
+        }
+        
+        /* Enhanced Buttons */
+        .control-button {
+            padding: var(--space-3) var(--space-5);
+            background: var(--gradient-primary);
+            border: none;
+            color: var(--color-white);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-strong) 0%, var(--color-primary) 100%);
+            transition: var(--transition-fast);
+            z-index: -1;
+        }
+        
+        .control-button:hover::before {
+            left: 0;
+        }
+        
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), var(--glow-strong);
+        }
+        
+        .control-button:active {
+            transform: translateY(0);
+        }
+        
+        .control-button.primary {
+            background: var(--gradient-accent);
+            font-weight: 700;
+            box-shadow: var(--shadow-md), var(--glow-accent);
+        }
+        
+        .control-button.export-button {
+            background: linear-gradient(135deg, var(--color-success) 0%, #2ed573 100%);
+        }
+        
+        /* Form Controls */
+        .speed-control-group,
+        .view-mode-group,
+        .export-group {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        
+        .speed-control {
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(125, 156, 183, 0.2);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            transition: var(--transition-normal);
+            width: 120px;
+        }
+        
+        .speed-control::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .speed-control::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        #speed-display {
+            color: var(--color-primary);
+            font-weight: 600;
+            font-family: var(--font-mono);
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .view-button {
+            padding: var(--space-2) var(--space-4);
+            background: rgba(125, 156, 183, 0.1);
+            border: 1px solid rgba(125, 156, 183, 0.3);
+            color: var(--color-light);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            font-size: 0.85rem;
+        }
+        
+        .view-button.active,
+        .view-button:hover {
+            background: var(--gradient-primary);
+            border-color: var(--color-strong);
+            color: var(--color-white);
+        }
+        
+        /* Content Areas */
+        .timeline-container,
+        .ai-battle-container,
+        .metrics-container,
+        .sar-container {
+            min-height: 300px;
+            background: rgba(10, 10, 10, 0.3);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(125, 156, 183, 0.1);
+            padding: var(--space-6);
+            margin-top: var(--space-4);
+            transition: var(--transition-normal);
+        }
+        
+        .timeline-container:hover,
+        .ai-battle-container:hover,
+        .metrics-container:hover,
+        .sar-container:hover {
+            border-color: rgba(125, 156, 183, 0.3);
+        }
+        
+        .hydra-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-top: var(--space-4);
+        }
+        
+        .timeline-info {
+            margin-top: var(--space-4);
+            padding: var(--space-4);
+            background: rgba(125, 156, 183, 0.05);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(125, 156, 183, 0.1);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: var(--z-overlay);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-normal);
+        }
+        
+        .loading-overlay:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(125, 156, 183, 0.2);
+            border-top: 3px solid var(--color-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: var(--space-4);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-overlay p {
+            color: var(--color-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* Enhanced Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: var(--z-modal);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-normal);
+        }
+        
+        .modal:not(.hidden) {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--gradient-dark);
+            padding: var(--space-8);
+            border-radius: var(--radius-xl);
+            border: 2px solid rgba(125, 156, 183, 0.3);
+            box-shadow: var(--shadow-xl), var(--glow-primary);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9) translateY(20px);
+            transition: var(--transition-normal);
+        }
+        
+        .modal:not(.hidden) .modal-content {
+            transform: scale(1) translateY(0);
+        }
+        
+        .modal-content h3 {
+            color: var(--color-light);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-6);
+            text-align: center;
+            filter: drop-shadow(var(--glow-primary));
+        }
+        
+        .scenario-options {
+            display: grid;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+        
+        .scenario-button {
+            padding: var(--space-5);
+            background: rgba(125, 156, 183, 0.1);
+            border: 1px solid rgba(125, 156, 183, 0.3);
+            color: var(--color-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scenario-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0.8;
+            transition: var(--transition-normal);
+            z-index: -1;
+        }
+        
+        .scenario-button:hover::before {
+            left: 0;
+        }
+        
+        .scenario-button:hover {
+            color: var(--color-white);
+            border-color: var(--color-strong);
+            box-shadow: var(--glow-strong);
+            transform: translateX(5px);
+        }
+        
+        .close-button {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--gradient-primary);
+            border: none;
+            color: var(--color-white);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition-normal);
+        }
+        
+        .close-button:hover {
+            background: linear-gradient(135deg, var(--color-strong) 0%, var(--color-primary) 100%);
+            box-shadow: var(--glow-strong);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .hydra-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: var(--space-4);
+                gap: var(--space-6);
+            }
+            
+            .main-nav {
+                padding: var(--space-4);
+                flex-direction: column;
+                gap: var(--space-4);
+            }
+            
+            .nav-controls {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: stretch;
+            }
+            
+            .chronos-controls,
+            .hydra-controls,
+            .autosar-controls {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            section {
+                padding: var(--space-6);
+            }
+            
+            .modal-content {
+                padding: var(--space-6);
+                margin: var(--space-4);
+                width: calc(100% - 2rem);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard {
+                padding: var(--space-3);
+            }
+            
+            .main-nav {
+                padding: var(--space-3);
+            }
+            
+            section {
+                padding: var(--space-4);
+            }
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .pulse-warning {
+            animation: pulse-warning 2s infinite;
+        }
+        
+        @keyframes pulse-warning {
+            0%, 100% { 
+                opacity: 1; 
+                box-shadow: var(--shadow-md);
+            }
+            50% { 
+                opacity: 0.8; 
+                box-shadow: var(--shadow-lg), 0 0 20px var(--color-warning);
+            }
+        }
+        
+        /* Focus states for accessibility */
+        button:focus-visible,
+        input:focus-visible,
+        .nav-button:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            body::before {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Enhanced Navigation -->
+        <nav class="main-nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-brand">
+                <h1>TriNetra</h1>
+                <span class="tagline">Making the invisible visible</span>
+            </div>
+            <div class="nav-controls">
+                <button id="scenario-select" class="nav-button" aria-haspopup="dialog">
+                    <span>Scenarios</span>
+                </button>
+                <button id="settings-button" class="nav-button" aria-haspopup="dialog">
+                    <span>Settings</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard" role="main">
+            <!-- CHRONOS Section -->
+            <section class="chronos-section" aria-labelledby="chronos-title">
+                <div class="section-header">
+                    <h2 id="chronos-title">🕐 CHRONOS Timeline</h2>
+                    <div class="chronos-controls">
+                        <div class="control-group">
+                            <button id="play-button" class="control-button primary" aria-label="Play timeline">
+                                ▶️ Play
+                            </button>
+                            <button id="pause-button" class="control-button" aria-label="Pause timeline">
+                                ⏸️ Pause
+                            </button>
+                            <button id="reset-button" class="control-button" aria-label="Reset timeline">
+                                🔄 Reset
+                            </button>
+                        </div>
+                        
+                        <div class="control-group speed-control-group">
+                            <label for="speed-slider">Speed:</label>
+                            <input 
+                                type="range" 
+                                id="speed-slider" 
+                                min="1" 
+                                max="50" 
+                                value="10" 
+                                class="speed-control"
+                                aria-label="Timeline speed control"
+                            >
+                            <span id="speed-display" aria-live="polite">10x</span>
+                        </div>
+                        
+                        <div class="control-group view-mode-group">
+                            <button id="timeline-view" class="view-button active" aria-pressed="true">
+                                📈 Timeline
+                            </button>
+                            <button id="network-view" class="view-button" aria-pressed="false">
+                                🕸️ Network
+                            </button>
+                        </div>
+                        
+                        <div class="export-group">
+                            <button id="export-chronos" class="control-button export-button">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="chronos-timeline" class="timeline-container" role="img" aria-label="Financial crime timeline visualization"></div>
+                <div id="timeline-info" class="timeline-info" aria-live="polite"></div>
+            </section>
+
+            <!-- HYDRA Section -->
+            <section class="hydra-section" aria-labelledby="hydra-title">
+                <div class="section-header">
+                    <h2 id="hydra-title">🐍 HYDRA AI Red-Team</h2>
+                    <div class="hydra-controls">
+                        <div class="control-group">
+                            <button id="start-battle" class="control-button primary" aria-label="Start AI battle simulation">
+                                ⚔️ Start Battle
+                            </button>
+                            <button id="stop-battle" class="control-button" aria-label="Stop AI battle simulation">
+                                ⏹️ Stop Battle
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <button id="generate-pattern" class="control-button" aria-label="Generate new attack pattern">
+                                🔥 Generate Attack
+                            </button>
+                            <button id="run-simulation" class="control-button" aria-label="Run red team simulation">
+                                🧪 Run Simulation
+                            </button>
+                        </div>
+                        
+                        <div class="export-group">
+                            <button id="export-hydra" class="control-button export-button">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="hydra-dashboard">
+                    <div id="ai-battle" class="ai-battle-container" role="img" aria-label="AI battle visualization"></div>
+                    <div id="detection-metrics" class="metrics-container" role="img" aria-label="Detection metrics dashboard"></div>
+                </div>
+            </section>
+
+            <!-- Auto-SAR Section -->
+            <section class="autosar-section" aria-labelledby="autosar-title">
+                <div class="section-header">
+                    <h2 id="autosar-title">📋 Auto-SAR Generator</h2>
+                    <div class="autosar-controls">
+                        <div class="control-group">
+                            <button id="ai-analyze" class="control-button primary" aria-label="Start AI analysis">
+                                🤖 AI Analysis
+                            </button>
+                            <button id="generate-sar" class="control-button" aria-label="Generate SAR report">
+                                📋 Generate SAR
+                            </button>
+                        </div>
+                        
+                        <div class="control-group">
+                            <button id="validate-report" class="control-button" aria-label="Validate generated report">
+                                ⚖️ Validate
+                            </button>
+                            <button id="export-sar" class="control-button export-button">
+                                📄 Export PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="sar-report" class="sar-container" role="region" aria-label="SAR report content"></div>
+                <div id="sar-map" role="img" aria-label="Geographic visualization of suspicious activities"></div>
+            </section>
+        </main>
+
+        <!-- Enhanced Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden" role="status" aria-live="polite" aria-label="Loading">
+            <div class="loading-spinner" aria-hidden="true"></div>
+            <p>Loading TriNetra...</p>
+        </div>
+
+        <!-- Enhanced Scenario Modal -->
+        <div id="scenario-modal" class="modal hidden" role="dialog" aria-labelledby="scenario-modal-title" aria-modal="true">
+            <div class="modal-content">
+                <h3 id="scenario-modal-title">Select Financial Crime Scenario</h3>
+                <div class="scenario-options">
+                    <button class="scenario-button" data-scenario="terrorist_financing" aria-describedby="terrorist-desc">
+                        🎯 Terrorist Financing
+                        <small id="terrorist-desc" style="display: block; margin-top: 0.5rem; opacity: 0.8; font-size: 0.85rem;">
+                            Detect and track suspicious financial flows related to terrorist activities
+                        </small>
+                    </button>
+                    <button class="scenario-button" data-scenario="crypto_sanctions" aria-describedby="crypto-desc">
+                        💰 Cryptocurrency Sanctions
+                        <small id="crypto-desc" style="display: block; margin-top: 0.5rem; opacity: 0.8; font-size: 0.85rem;">
+                            Monitor digital asset transactions for sanctions compliance
+                        </small>
+                    </button>
+                    <button class="scenario-button" data-scenario="human_trafficking" aria-describedby="trafficking-desc">
+                        🚨 Human Trafficking
+                        <small id="trafficking-desc" style="display: block; margin-top: 0.5rem; opacity: 0.8; font-size: 0.85rem;">
+                            Identify financial patterns associated with human trafficking networks
+                        </small>
+                    </button>
+                    <button class="scenario-button" data-scenario="money_laundering" aria-describedby="laundering-desc">
+                        🏦 Money Laundering
+                        <small id="laundering-desc" style="display: block; margin-top: 0.5rem; opacity: 0.8; font-size: 0.85rem;">
+                            Advanced detection of complex money laundering schemes
+                        </small>
+                    </button>
+                </div>
+                <button id="close-modal" class="close-button" aria-label="Close scenario selection">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Scripts -->
+    <script type="module">
+        // Modern JavaScript with improved error handling and accessibility
+        class TriNetraApp {
+            constructor() {
+                this.currentScenario = null;
+                this.isPlaying = false;
+                this.currentSpeed = 10;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.initializeAccessibility();
+                this.showWelcomeMessage();
+            }
+
+            bindEvents() {
+                // Navigation events
+                document.getElementById('scenario-select')?.addEventListener('click', () => this.openScenarioModal());
+                document.getElementById('settings-button')?.addEventListener('click', () => this.openSettings());
+                document.getElementById('close-modal')?.addEventListener('click', () => this.closeModal());
+
+                // CHRONOS events
+                document.getElementById('play-button')?.addEventListener('click', () => this.playTimeline());
+                document.getElementById('pause-button')?.addEventListener('click', () => this.pauseTimeline());
+                document.getElementById('reset-button')?.addEventListener('click', () => this.resetTimeline());
+                document.getElementById('speed-slider')?.addEventListener('input', (e) => this.updateSpeed(e.target.value));
+                document.getElementById('timeline-view')?.addEventListener('click', () => this.switchView('timeline'));
+                document.getElementById('network-view')?.addEventListener('click', () => this.switchView('network'));
+                document.getElementById('export-chronos')?.addEventListener('click', () => this.exportPDF('chronos'));
+
+                // HYDRA events
+                document.getElementById('start-battle')?.addEventListener('click', () => this.startBattle());
+                document.getElementById('stop-battle')?.addEventListener('click', () => this.stopBattle());
+                document.getElementById('generate-pattern')?.addEventListener('click', () => this.generatePattern());
+                document.getElementById('run-simulation')?.addEventListener('click', () => this.runSimulation());
+                document.getElementById('export-hydra')?.addEventListener('click', () => this.exportPDF('hydra'));
+
+                // Auto-SAR events
+                document.getElementById('ai-analyze')?.addEventListener('click', () => this.startAIAnalysis());
+                document.getElementById('generate-sar')?.addEventListener('click', () => this.generateSAR());
+                document.getElementById('validate-report')?.addEventListener('click', () => this.validateReport());
+                document.getElementById('export-sar')?.addEventListener('click', () => this.exportPDF('sar'));
+
+                // Scenario selection
+                document.querySelectorAll('.scenario-button').forEach(button => {
+                    button.addEventListener('click', (e) => this.selectScenario(e.target.dataset.scenario));
+                });
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
+                // Modal backdrop click
+                document.getElementById('scenario-modal')?.addEventListener('click', (e) => {
+                    if (e.target.id === 'scenario-modal') this.closeModal();
+                });
+            }
+
+            initializeAccessibility() {
+                // Set up ARIA live regions
+                const timelineInfo = document.getElementById('timeline-info');
+                if (timelineInfo) {
+                    timelineInfo.setAttribute('aria-live', 'polite');
+                }
+
+                // Initialize focus management
+                this.setupFocusTrap();
+            }
+
+            setupFocusTrap() {
+                const modal = document.getElementById('scenario-modal');
+                if (!modal) return;
+
+                modal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            showWelcomeMessage() {
+                const timelineInfo = document.getElementById('timeline-info');
+                if (timelineInfo) {
+                    timelineInfo.innerHTML = `
+                        <div style="text-align: center; color: var(--color-accent); font-size: 0.9rem;">
+                            <p>🚀 <strong>Welcome to TriNetra</strong></p>
+                            <p>Select a scenario to begin financial crime detection analysis</p>
+                            <p><em>All systems ready • AI models loaded • Real-time monitoring active</em></p>
+                        </div>
+                    `;
+                }
+            }
+
+            openScenarioModal() {
+                const modal = document.getElementById('scenario-modal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                    // Focus first scenario button
+                    setTimeout(() => {
+                        modal.querySelector('.scenario-button')?.focus();
+                    }, 100);
+                }
+            }
+
+            closeModal() {
+                const modal = document.getElementById('scenario-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    document.getElementById('scenario-select')?.focus();
+                }
+            }
+
+            selectScenario(scenario) {
+                this.currentScenario = scenario;
+                this.closeModal();
+                this.loadScenario(scenario);
+            }
+
+            loadScenario(scenario) {
+                this.showLoading();
+                const scenarioNames = {
+                    'terrorist_financing': 'Terrorist Financing',
+                    'crypto_sanctions': 'Cryptocurrency Sanctions',
+                    'human_trafficking': 'Human Trafficking',
+                    'money_laundering': 'Money Laundering'
+                };
+
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.updateTimelineInfo(`
+                        <div style="color: var(--color-success);">
+                            <p><strong>📊 Scenario Loaded:</strong> ${scenarioNames[scenario]}</p>
+                            <p><strong>🔍 Status:</strong> Ready for analysis</p>
+                            <p><strong>⚡ Models:</strong> AI detection algorithms activated</p>
+                            <p><em>Click "Play" to start timeline analysis</em></p>
+                        </div>
+                    `);
+                }, 1500);
+            }
+
+            playTimeline() {
+                if (!this.currentScenario) {
+                    this.showNotification('Please select a scenario first', 'warning');
+                    return;
+                }
+
+                this.isPlaying = true;
+                this.updateButtonStates();
+                this.simulateTimelinePlayback();
+            }
+
+            pauseTimeline() {
+                this.isPlaying = false;
+                this.updateButtonStates();
+                this.updateTimelineInfo(`
+                    <div style="color: var(--color-warning);">
+                        <p><strong>⏸️ Timeline Paused</strong></p>
+                        <p>Analysis suspended at current position</p>
+                    </div>
+                `);
+            }
+
+            resetTimeline() {
+                this.isPlaying = false;
+                this.updateButtonStates();
+                this.updateTimelineInfo(`
+                    <div style="color: var(--color-info);">
+                        <p><strong>🔄 Timeline Reset</strong></p>
+                        <p>Returning to initial state</p>
+                    </div>
+                `);
+            }
+
+            updateSpeed(value) {
+                this.currentSpeed = value;
+                document.getElementById('speed-display').textContent = `${value}x`;
+                if (this.isPlaying) {
+                    this.updateTimelineInfo(`
+                        <div style="color: var(--color-accent);">
+                            <p><strong>⚡ Speed Updated:</strong> ${value}x playback</p>
+                        </div>
+                    `);
+                }
+            }
+
+            switchView(viewType) {
+                document.querySelectorAll('.view-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-pressed', 'false');
+                });
+
+                const activeButton = document.getElementById(`${viewType}-view`);
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                    activeButton.setAttribute('aria-pressed', 'true');
+                }
+
+                this.updateTimelineInfo(`
+                    <div style="color: var(--color-primary);">
+                        <p><strong>👁️ View Switched:</strong> ${viewType.charAt(0).toUpperCase() + viewType.slice(1)} mode</p>
+                    </div>
+                `);
+            }
+
+            startBattle() {
+                this.simulateAIBattle();
+            }
+
+            stopBattle() {
+                this.updateMetrics(`
+                    <div style="color: var(--color-error); text-align: center; padding: 2rem;">
+                        <p><strong>🛑 Battle Stopped</strong></p>
+                        <p>Red team simulation terminated</p>
+                    </div>
+                `);
+            }
+
+            generatePattern() {
+                this.showLoading();
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.updateBattleDisplay(`
+                        <div style="color: var(--color-warning); text-align: center; padding: 2rem;">
+                            <p><strong>🔥 New Attack Pattern Generated</strong></p>
+                            <p>Advanced evasion techniques detected</p>
+                            <p>Updating defense protocols...</p>
+                        </div>
+                    `);
+                }, 1000);
+            }
+
+            runSimulation() {
+                this.simulateRedTeamTest();
+            }
+
+            startAIAnalysis() {
+                if (!this.currentScenario) {
+                    this.showNotification('Please select a scenario first', 'warning');
+                    return;
+                }
+
+                this.showLoading();
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.updateSARReport(`
+                        <div style="color: var(--color-success); padding: 2rem;">
+                            <h4>🤖 AI Analysis Complete</h4>
+                            <p><strong>Suspicious Activities Detected:</strong> 23 patterns</p>
+                            <p><strong>Risk Level:</strong> High</p>
+                            <p><strong>Confidence Score:</strong> 94.7%</p>
+                            <div style="margin-top: 1rem; padding: 1rem; background: rgba(125, 156, 183, 0.1); border-radius: 8px;">
+                                <p><em>Analysis ready for SAR generation</em></p>
+                            </div>
+                        </div>
+                    `);
+                }, 2000);
+            }
+
+            generateSAR() {
+                this.showLoading();
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.updateSARReport(`
+                        <div style="padding: 2rem;">
+                            <h4 style="color: var(--color-primary); margin-bottom: 1rem;">📋 SAR Report Generated</h4>
+                            <div style="background: rgba(10, 10, 10, 0.5); padding: 1.5rem; border-radius: 8px; font-family: var(--font-mono); font-size: 0.85rem;">
+                                <p><strong>Report ID:</strong> SAR-${Date.now()}</p>
+                                <p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+                                <p><strong>Scenario:</strong> ${this.currentScenario?.replace('_', ' ').toUpperCase()}</p>
+                                <p><strong>Status:</strong> Ready for validation</p>
+                            </div>
+                        </div>
+                    `);
+                    this.initializeSARMap();
+                }, 1500);
+            }
+
+            validateReport() {
+                this.showLoading();
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.showNotification('Report validation complete - All checks passed', 'success');
+                }, 1000);
+            }
+
+            exportPDF(type) {
+                this.showNotification(`Exporting ${type.toUpperCase()} report to PDF...`, 'info');
+                setTimeout(() => {
+                    this.showNotification('PDF export completed successfully', 'success');
+                }, 1500);
+            }
+
+            // Simulation methods
+            simulateTimelinePlayback() {
+                if (!this.isPlaying) return;
+
+                const events = [
+                    'Transaction spike detected',
+                    'Pattern anomaly identified',
+                    'Cross-border movement flagged',
+                    'Network connection established',
+                    'Risk threshold exceeded'
+                ];
+
+                const randomEvent = events[Math.floor(Math.random() * events.length)];
+                
+                this.updateTimelineInfo(`
+                    <div style="color: var(--color-success);">
+                        <p><strong>▶️ Live Analysis:</strong> ${randomEvent}</p>
+                        <p><strong>Speed:</strong> ${this.currentSpeed}x | <strong>Status:</strong> Active</p>
+                        <p><em>Real-time processing at ${Math.floor(Math.random() * 1000 + 100)} events/sec</em></p>
+                    </div>
+                `);
+
+                setTimeout(() => this.simulateTimelinePlayback(), 2000 / this.currentSpeed);
+            }
+
+            simulateAIBattle() {
+                this.updateBattleDisplay(`
+                    <div style="color: var(--color-error); text-align: center; padding: 2rem;">
+                        <p><strong>⚔️ AI Battle Initiated</strong></p>
+                        <p>Red Team vs Blue Team</p>
+                        <p>Attack vectors deploying...</p>
+                    </div>
+                `);
+
+                setTimeout(() => {
+                    this.updateMetrics(`
+                        <div style="padding: 2rem;">
+                            <h4 style="color: var(--color-warning); margin-bottom: 1rem;">📊 Battle Metrics</h4>
+                            <div style="display: grid; gap: 1rem;">
+                                <div style="background: rgba(125, 156, 183, 0.1); padding: 1rem; border-radius: 8px;">
+                                    <strong>Attacks Attempted:</strong> 247
+                                </div>
+                                <div style="background: rgba(46, 213, 115, 0.1); padding: 1rem; border-radius: 8px;">
+                                    <strong>Attacks Blocked:</strong> 241 (97.6%)
+                                </div>
+                                <div style="background: rgba(255, 71, 87, 0.1); padding: 1rem; border-radius: 8px;">
+                                    <strong>Breaches:</strong> 6 (2.4%)
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                }, 1500);
+            }
+
+            simulateRedTeamTest() {
+                this.showLoading();
+                setTimeout(() => {
+                    this.hideLoading();
+                    this.updateBattleDisplay(`
+                        <div style="color: var(--color-info); text-align: center; padding: 2rem;">
+                            <p><strong>🧪 Simulation Complete</strong></p>
+                            <p>Defense effectiveness: 94.3%</p>
+                            <p>Recommendations generated</p>
+                        </div>
+                    `);
+                }, 2000);
+            }
+
+            initializeSARMap() {
+                const mapContainer = document.getElementById('sar-map');
+                if (!mapContainer) return;
+
+                mapContainer.innerHTML = `
+                    <div style="height: 300px; background: rgba(10, 10, 10, 0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-accent);">
+                        <div style="text-align: center;">
+                            <p><strong>🗺️ Geographic Analysis</strong></p>
+                            <p>Interactive map visualization</p>
+                            <p><em>Suspicious activity locations highlighted</em></p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // UI Helper methods
+            updateButtonStates() {
+                const playBtn = document.getElementById('play-button');
+                const pauseBtn = document.getElementById('pause-button');
+                
+                if (this.isPlaying) {
+                    playBtn?.classList.remove('primary');
+                    pauseBtn?.classList.add('primary');
+                } else {
+                    playBtn?.classList.add('primary');
+                    pauseBtn?.classList.remove('primary');
+                }
+            }
+
+            updateTimelineInfo(content) {
+                const element = document.getElementById('timeline-info');
+                if (element) element.innerHTML = content;
+            }
+
+            updateBattleDisplay(content) {
+                const element = document.getElementById('ai-battle');
+                if (element) element.innerHTML = content;
+            }
+
+            updateMetrics(content) {
+                const element = document.getElementById('detection-metrics');
+                if (element) element.innerHTML = content;
+            }
+
+            updateSARReport(content) {
+                const element = document.getElementById('sar-report');
+                if (element) element.innerHTML = content;
+            }
+
+            showLoading() {
+                document.getElementById('loading-overlay')?.classList.remove('hidden');
+            }
+
+            hideLoading() {
+                document.getElementById('loading-overlay')?.classList.add('hidden');
+            }
+
+            showNotification(message, type = 'info') {
+                // Create temporary notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 1rem 1.5rem;
+                    background: var(--gradient-primary);
+                    color: white;
+                    border-radius: var(--radius-md);
+                    box-shadow: var(--shadow-lg);
+                    z-index: 1001;
+                    animation: slideIn 0.3s ease-out;
+                `;
+                
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease-in forwards';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 3000);
+            }
+
+            openSettings() {
+                this.showNotification('Settings panel coming soon', 'info');
+            }
+
+            handleKeyboard(e) {
+                // Global keyboard shortcuts
+                if (e.ctrlKey || e.metaKey) {
+                    switch(e.key) {
+                        case 's':
+                            e.preventDefault();
+                            this.openScenarioModal();
+                            break;
+                        case 'p':
+                            e.preventDefault();
+                            if (this.isPlaying) this.pauseTimeline();
+                            else this.playTimeline();
+                            break;
+                        case 'r':
+                            e.preventDefault();
+                            this.resetTimeline();
+                            break;
+                    }
+                }
+
+                if (e.key === 'Escape') {
+                    this.closeModal();
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new TriNetraApp();
+        });
+
+        // Legacy support for the SAR map initialization
+        if (typeof window.initSarMap === 'undefined') {
+            window.initSarMap = function() {
+                console.log('SAR Map initialized');
+            };
+        }
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Add slide animation styles -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+</html>
