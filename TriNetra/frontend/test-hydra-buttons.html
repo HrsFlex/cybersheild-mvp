@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYDRA Button Functionality Test</title>
+    <style>
+        body {
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #16213e;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #00ff87;
+        }
+        
+        .hydra-controls {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .control-button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            background: #333;
+            border: 1px solid #555;
+        }
+        
+        .control-button.primary {
+            background: linear-gradient(135deg, #00ff87, #00d4ff);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(0, 255, 135, 0.3);
+        }
+        
+        .control-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 255, 135, 0.4);
+        }
+        
+        .status-display {
+            background: #0a0a0f;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #333;
+            min-height: 100px;
+            font-family: monospace;
+        }
+        
+        .debug-info {
+            background: #1a1a2e;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border: 1px solid #444;
+        }
+        
+        .working { color: #00ff87; }
+        .error { color: #ff6b6b; }
+        .warning { color: #ffa500; }
+        
+        #ai-battle {
+            background: #0a0a0f;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            min-height: 200px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 HYDRA Button Functionality Test</h1>
+        <p>Testing the start and stop battle button functionality</p>
+        
+        <!-- Simulate HYDRA Controls -->
+        <div class="hydra-controls">
+            <button id="start-battle" class="control-button primary">⚔️ Start Battle</button>
+            <button id="stop-battle" class="control-button">⏹️ Stop Battle</button>
+            <button id="generate-pattern" class="control-button">🔥 Generate Attack</button>
+            <button id="run-simulation" class="control-button">🧪 Run Simulation</button>
+            <button id="export-hydra" class="control-button export-button">📄 Export PDF</button>
+        </div>
+        
+        <!-- Simulate AI Battle Container -->
+        <div id="ai-battle">
+            <p>AI Battle Container - This will be populated by the HYDRA system</p>
+        </div>
+        
+        <div class="status-display" id="status-display">
+            <div class="working">✅ Test page initialized</div>
+            <div>Click buttons to test functionality...</div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>🔍 Debug Information:</h3>
+            <div id="debug-info">
+                <div>Loading debug information...</div>
+            </div>
+        </div>
+        
+        <div class="debug-info">
+            <h3>🎮 Manual Tests:</h3>
+            <button onclick="manualTestStart()" class="control-button">Test Start Function</button>
+            <button onclick="manualTestStop()" class="control-button">Test Stop Function</button>
+            <button onclick="checkButtonExistence()" class="control-button">Check Buttons</button>
+            <button onclick="clearStatus()" class="control-button">Clear Status</button>
+        </div>
+    </div>
+
+    <!-- Include required utilities -->
+    <script>
+        // Mock utilities and API for testing
+        const showLoading = () => addStatus('📡 Loading...', 'working');
+        const hideLoading = () => addStatus('✅ Loading complete', 'working');
+        const showNotification = (msg, type) => addStatus(`📢 ${msg}`, type === 'error' ? 'error' : 'working');
+        
+        const api = {
+            startAIBattle: () => Promise.resolve({
+                status: 'success',
+                battle_data: { battle_id: 'test_123', scenario: 'test' }
+            })
+        };
+        
+        function addStatus(message, className = '') {
+            const status = document.getElementById('status-display');
+            const div = document.createElement('div');
+            div.className = className;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            status.appendChild(div);
+            status.scrollTop = status.scrollHeight;
+        }
+        
+        function clearStatus() {
+            document.getElementById('status-display').innerHTML = '<div class="working">Status cleared</div>';
+        }
+        
+        function checkButtonExistence() {
+            const buttons = [
+                'start-battle',
+                'stop-battle', 
+                'generate-pattern',
+                'run-simulation',
+                'export-hydra'
+            ];
+            
+            addStatus('🔍 Checking button existence...', 'working');
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    addStatus(`✅ ${id}: Found`, 'working');
+                } else {
+                    addStatus(`❌ ${id}: Missing`, 'error');
+                }
+            });
+        }
+        
+        function manualTestStart() {
+            addStatus('🎮 Manual test: Calling startBattle()', 'working');
+            try {
+                if (window.hydraDebug && window.hydraDebug.testStart) {
+                    window.hydraDebug.testStart();
+                    addStatus('✅ startBattle() called successfully', 'working');
+                } else {
+                    addStatus('⚠️ HYDRA debug interface not available', 'warning');
+                }
+            } catch (error) {
+                addStatus(`❌ Error calling startBattle(): ${error.message}`, 'error');
+            }
+        }
+        
+        function manualTestStop() {
+            addStatus('🛑 Manual test: Calling stopBattle()', 'working');
+            try {
+                if (window.hydraDebug && window.hydraDebug.testStop) {
+                    window.hydraDebug.testStop();
+                    addStatus('✅ stopBattle() called successfully', 'working');
+                } else {
+                    addStatus('⚠️ HYDRA debug interface not available', 'warning');
+                }
+            } catch (error) {
+                addStatus(`❌ Error calling stopBattle(): ${error.message}`, 'error');
+            }
+        }
+        
+        function updateDebugInfo() {
+            const debugDiv = document.getElementById('debug-info');
+            const startBtn = document.getElementById('start-battle');
+            const stopBtn = document.getElementById('stop-battle');
+            const hydraControls = document.querySelector('.hydra-controls');
+            
+            debugDiv.innerHTML = `
+                <div>Start Button: ${startBtn ? '✅ Found' : '❌ Missing'}</div>
+                <div>Stop Button: ${stopBtn ? '✅ Found' : '❌ Missing'}</div>
+                <div>HYDRA Controls: ${hydraControls ? '✅ Found' : '❌ Missing'}</div>
+                <div>Window.hydraDebug: ${window.hydraDebug ? '✅ Available' : '❌ Not Available'}</div>
+                <div>Current Time: ${new Date().toLocaleTimeString()}</div>
+            `;
+        }
+        
+        // Check button functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            addStatus('🚀 DOM loaded, setting up test listeners...', 'working');
+            
+            // Add test event listeners
+            const startBtn = document.getElementById('start-battle');
+            const stopBtn = document.getElementById('stop-battle');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', () => {
+                    addStatus('🎮 Start button clicked!', 'working');
+                });
+                addStatus('✅ Start button listener added', 'working');
+            }
+            
+            if (stopBtn) {
+                stopBtn.addEventListener('click', () => {
+                    addStatus('🛑 Stop button clicked!', 'working');
+                });
+                addStatus('✅ Stop button listener added', 'working');
+            }
+            
+            updateDebugInfo();
+            setInterval(updateDebugInfo, 2000); // Update every 2 seconds
+        });
+    </script>
+    
+    <!-- Simulate loading the enhanced HYDRA (simplified version) -->
+    <script type="module">
+        // Simplified HYDRA for testing button functionality
+        class TestHydra {
+            constructor() {
+                this.isRunning = false;
+                this.battleInterval = null;
+                this.battleTimer = null;
+                
+                console.log('🧪 Test HYDRA initialized');
+                this.setupEventListeners();
+                
+                // Make debug interface available
+                window.hydraDebug = {
+                    instance: this,
+                    testStart: () => this.startBattle(),
+                    testStop: () => this.stopBattle(),
+                    status: () => ({
+                        isRunning: this.isRunning,
+                        battleInterval: !!this.battleInterval,
+                        battleTimer: !!this.battleTimer
+                    })
+                };
+                
+                addStatus('🧪 Test HYDRA system loaded', 'working');
+                addStatus('🔧 Debug interface available at window.hydraDebug', 'working');
+            }
+            
+            setupEventListeners() {
+                const startButton = document.getElementById('start-battle');
+                const stopButton = document.getElementById('stop-battle');
+                
+                if (startButton) {
+                    startButton.addEventListener('click', () => {
+                        addStatus('🎮 Start button event triggered', 'working');
+                        this.startBattle();
+                    });
+                    addStatus('✅ Start button listener attached', 'working');
+                } else {
+                    addStatus('❌ Start button not found', 'error');
+                }
+                
+                if (stopButton) {
+                    stopButton.addEventListener('click', () => {
+                        addStatus('🛑 Stop button event triggered', 'working');
+                        this.stopBattle();
+                    });
+                    addStatus('✅ Stop button listener attached', 'working');
+                } else {
+                    addStatus('❌ Stop button not found', 'error');
+                }
+            }
+            
+            async startBattle() {
+                addStatus('🚀 startBattle() method called', 'working');
+                
+                if (this.isRunning) {
+                    addStatus('⚠️ Battle already running', 'warning');
+                    return;
+                }
+                
+                try {
+                    this.isRunning = true;
+                    addStatus('✅ Battle state set to running', 'working');
+                    
+                    // Start battle timer
+                    this.battleTimer = setInterval(() => {
+                        addStatus('⏰ Battle timer tick', 'working');
+                    }, 5000);
+                    
+                    // Start battle rounds
+                    this.battleInterval = setInterval(() => {
+                        addStatus('⚔️ Battle round executed', 'working');
+                    }, 3000);
+                    
+                    addStatus('🎉 Battle started successfully!', 'working');
+                    showNotification('Test battle started', 'success');
+                    
+                } catch (error) {
+                    addStatus(`❌ Error starting battle: ${error.message}`, 'error');
+                    this.isRunning = false;
+                }
+            }
+            
+            stopBattle() {
+                addStatus('🛑 stopBattle() method called', 'working');
+                
+                if (!this.isRunning) {
+                    addStatus('⚠️ Battle not running', 'warning');
+                    return;
+                }
+                
+                this.isRunning = false;
+                
+                if (this.battleInterval) {
+                    clearInterval(this.battleInterval);
+                    this.battleInterval = null;
+                    addStatus('✅ Battle interval cleared', 'working');
+                }
+                
+                if (this.battleTimer) {
+                    clearInterval(this.battleTimer);
+                    this.battleTimer = null;
+                    addStatus('✅ Battle timer cleared', 'working');
+                }
+                
+                addStatus('🏁 Battle stopped successfully!', 'working');
+                showNotification('Test battle stopped', 'info');
+            }
+        }
+        
+        // Initialize test HYDRA
+        const testHydra = new TestHydra();
+    </script>
+</body>
+</html>

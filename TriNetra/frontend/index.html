@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TriNetra - Financial Crime Detection</title>
+    <meta name="description" content="Making the invisible visible - Advanced AI-powered financial crime detection">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#00ff87">
+    <link rel="apple-touch-icon" href="./static/icons/icon-192x192.png">
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-brand">
+                <h1>TriNetra</h1>
+                <span class="tagline">Making the invisible visible</span>
+            </div>
+            <div class="nav-controls">
+                <button id="scenario-select" class="nav-button">Scenarios</button>
+                <button id="settings-button" class="nav-button">Settings</button>
+            </div>
+        </nav>
+
+        <!-- Main Dashboard -->
+        <main class="dashboard">
+            <!-- CHRONOS Section -->
+            <section class="chronos-section">
+                <div class="section-header">
+                    <h2>🕐 CHRONOS Timeline</h2>
+                    <div class="chronos-controls">
+                        <button id="play-button" class="control-button">▶️ Play</button>
+                        <button id="pause-button" class="control-button">⏸️ Pause</button>
+                        <button id="reset-button" class="control-button">🔄 Reset</button>
+                        <div class="speed-control-group">
+                            <label for="speed-slider">Speed:</label>
+                            <input type="range" id="speed-slider" min="1" max="50" value="10" class="speed-control">
+                            <span id="speed-display">10x</span>
+                        </div>
+                        <div class="view-mode-group">
+                            <button id="timeline-view" class="view-button active">📈 Timeline</button>
+                            <button id="network-view" class="view-button">🕸️ Network</button>
+                        </div>
+                        <div class="export-group">
+                            <button id="export-chronos" class="control-button export-button">📄 Export PDF</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="chronos-timeline" class="timeline-container"></div>
+                <div id="timeline-info" class="timeline-info"></div>
+            </section>
+
+            <!-- HYDRA Section -->
+            <section class="hydra-section">
+                <div class="section-header">
+                    <h2>🐍 HYDRA AI Red-Team</h2>
+                    <div class="hydra-controls">
+                        <button id="start-battle" class="control-button primary">⚔️ Start Battle</button>
+                        <button id="stop-battle" class="control-button">⏹️ Stop Battle</button>
+                        <button id="generate-pattern" class="control-button">🔥 Generate Attack</button>
+                        <button id="run-simulation" class="control-button">🧪 Run Simulation</button>
+                        <button id="export-hydra" class="control-button export-button">📄 Export PDF</button>
+                    </div>
+                </div>
+                <div class="hydra-dashboard">
+                    <div id="ai-battle" class="ai-battle-container"></div>
+                    <div id="detection-metrics" class="metrics-container"></div>
+                </div>
+            </section>
+
+            <!-- Auto-SAR Section -->
+            <section class="autosar-section">
+                <div class="section-header">
+                    <h2>📋 Auto-SAR Generator</h2>
+                    <div class="autosar-controls">
+                        <button id="ai-analyze" class="control-button primary">🤖 AI Analysis</button>
+                        <button id="generate-sar" class="control-button">📋 Generate SAR</button>
+                        <button id="validate-report" class="control-button">⚖️ Validate</button>
+                        <button id="export-sar" class="control-button">📄 Export PDF</button>
+                    </div>
+                </div>
+                <div id="sar-report" class="sar-container"></div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-spinner"></div>
+            <p>Loading TriNetra...</p>
+        </div>
+
+        <!-- Scenario Modal -->
+        <div id="scenario-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Select Scenario</h3>
+                <div class="scenario-options">
+                    <button class="scenario-button" data-scenario="terrorist_financing">
+                        🎯 Terrorist Financing
+                    </button>
+                    <button class="scenario-button" data-scenario="crypto_sanctions">
+                        💰 Crypto Sanctions
+                    </button>
+                    <button class="scenario-button" data-scenario="human_trafficking">
+                        🚨 Human Trafficking
+                    </button>
+                </div>
+                <button id="close-modal" class="close-button">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Script - Vite Entry Point -->
+    <script type="module" src="/js/main.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js');
+        }
+    </script>
+</body>
+</html>

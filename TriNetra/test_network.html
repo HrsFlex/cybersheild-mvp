@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHRONOS Network Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #0a0a0f; color: white; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #00ff87; border-radius: 8px; }
+        .btn { padding: 10px 20px; margin: 10px; background: #00ff87; color: #000; border: none; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background: #00d4ff; }
+        #status { margin: 10px 0; padding: 10px; background: #1a1a2e; border-radius: 4px; }
+        .error { color: #ff4757; }
+        .success { color: #00ff87; }
+        .info { color: #00d4ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕸️ CHRONOS Network View Test</h1>
+        
+        <div class="test-section">
+            <h3>Test Controls</h3>
+            <button class="btn" onclick="testBackendConnection()">Test Backend</button>
+            <button class="btn" onclick="testTimelineData()">Load Timeline Data</button>
+            <button class="btn" onclick="testNetworkView()">Test Network View</button>
+            <button class="btn" onclick="simulateNetworkClick()">Simulate Network Click</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Results</h3>
+            <div id="status">Ready to test...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Console Output</h3>
+            <div id="console-output" style="background: #000; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Capture console messages
+        const originalLog = console.log;
+        const originalError = console.error;
+        const consoleOutput = document.getElementById('console-output');
+        
+        function appendToConsole(message, type = 'log') {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? '#ff4757' : '#00ff87';
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            appendToConsole(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            appendToConsole(args.join(' '), 'error');
+        };
+        
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = type;
+            statusDiv.textContent = message;
+        }
+        
+        async function testBackendConnection() {
+            try {
+                updateStatus('Testing backend connection...', 'info');
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                if (data.status === 'healthy') {
+                    updateStatus('✅ Backend connection successful', 'success');
+                    console.log('Backend health check passed:', data);
+                } else {
+                    throw new Error('Backend not healthy');
+                }
+            } catch (error) {
+                updateStatus('❌ Backend connection failed: ' + error.message, 'error');
+                console.error('Backend test failed:', error);
+            }
+        }
+        
+        async function testTimelineData() {
+            try {
+                updateStatus('Loading timeline data...', 'info');
+                const response = await fetch('/api/chronos/timeline?scenario=terrorist_financing');
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.data.length > 0) {
+                    updateStatus(`✅ Loaded ${data.data.length} transactions`, 'success');
+                    console.log('Timeline data loaded:', data.total_transactions, 'transactions');
+                    
+                    // Store data globally for network test
+                    window.testData = data.data;
+                } else {
+                    throw new Error('No transaction data received');
+                }
+            } catch (error) {
+                updateStatus('❌ Timeline data loading failed: ' + error.message, 'error');
+                console.error('Timeline test failed:', error);
+            }
+        }
+        
+        function testNetworkView() {
+            try {
+                updateStatus('Testing network view creation...', 'info');
+                
+                if (!window.testData || window.testData.length === 0) {
+                    throw new Error('No test data available. Load timeline data first.');
+                }
+                
+                console.log('Creating network from', window.testData.length, 'transactions');
+                
+                // Simulate the createNetworkData function
+                const accounts = new Map();
+                const links = [];
+                
+                window.testData.forEach(tx => {
+                    // Create account nodes
+                    if (!accounts.has(tx.from_account)) {
+                        accounts.set(tx.from_account, {
+                            id: tx.from_account,
+                            label: tx.from_account.substring(0, 8) + '...',
+                            type: 'account',
+                            suspicious: false,
+                            transactions: []
+                        });
+                    }
+                    
+                    if (!accounts.has(tx.to_account)) {
+                        accounts.set(tx.to_account, {
+                            id: tx.to_account,
+                            label: tx.to_account.substring(0, 8) + '...',
+                            type: 'account',
+                            suspicious: false,
+                            transactions: []
+                        });
+                    }
+                    
+                    // Update suspicion levels
+                    if (tx.suspicious_score > 0.7) {
+                        accounts.get(tx.from_account).suspicious = true;
+                        accounts.get(tx.to_account).suspicious = true;
+                    }
+                    
+                    accounts.get(tx.from_account).transactions.push(tx);
+                    accounts.get(tx.to_account).transactions.push(tx);
+                    
+                    // Create link
+                    links.push({
+                        source: tx.from_account,
+                        target: tx.to_account,
+                        suspicious: tx.suspicious_score > 0.7,
+                        amount: tx.amount,
+                        transaction: tx
+                    });
+                });
+                
+                const networkNodes = Array.from(accounts.values());
+                const networkLinks = links;
+                
+                console.log(`Network created: ${networkNodes.length} nodes, ${networkLinks.length} links`);
+                
+                // Test for suspicious accounts
+                const suspiciousAccounts = networkNodes.filter(n => n.suspicious);
+                console.log(`Found ${suspiciousAccounts.length} suspicious accounts`);
+                
+                updateStatus(`✅ Network created: ${networkNodes.length} nodes, ${networkLinks.length} links`, 'success');
+                
+                // Store for further tests
+                window.networkNodes = networkNodes;
+                window.networkLinks = networkLinks;
+                
+            } catch (error) {
+                updateStatus('❌ Network view test failed: ' + error.message, 'error');
+                console.error('Network test failed:', error);
+            }
+        }
+        
+        function simulateNetworkClick() {
+            try {
+                updateStatus('Simulating network node interaction...', 'info');
+                
+                if (!window.networkNodes || window.networkNodes.length === 0) {
+                    throw new Error('No network nodes available. Test network view first.');
+                }
+                
+                // Pick a random suspicious node
+                const suspiciousNodes = window.networkNodes.filter(n => n.suspicious);
+                if (suspiciousNodes.length === 0) {
+                    throw new Error('No suspicious nodes found in network');
+                }
+                
+                const testNode = suspiciousNodes[0];
+                console.log('Testing node interaction with:', testNode.id);
+                console.log('Node details:', {
+                    type: testNode.type,
+                    suspicious: testNode.suspicious,
+                    transactions: testNode.transactions.length
+                });
+                
+                // Test tooltip content generation
+                const tooltipContent = `Account: ${testNode.id}<br/>Transactions: ${testNode.transactions.length}<br/>Suspicious: ${testNode.suspicious ? 'Yes' : 'No'}`;
+                console.log('Tooltip content:', tooltipContent);
+                
+                updateStatus(`✅ Network interaction test passed for ${testNode.label}`, 'success');
+                
+            } catch (error) {
+                updateStatus('❌ Network interaction test failed: ' + error.message, 'error');
+                console.error('Network interaction test failed:', error);
+            }
+        }
+        
+        // Auto-start basic tests
+        setTimeout(() => {
+            console.log('🔧 Starting automated network tests...');
+            testBackendConnection();
+        }, 1000);
+    </script>
+</body>
+</html>
