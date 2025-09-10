@@ -123,7 +123,7 @@ class TriNetraAPI {
         if (endpoint.includes('/autosar/generate')) {
             return {
                 status: "success",
-                data: {
+                sar_report: {
                     report_id: `SAR_${Date.now()}`,
                     title: "Suspicious Layering Activity Report",
                     priority: ["LOW", "MEDIUM", "HIGH"][Math.floor(Math.random() * 3)],

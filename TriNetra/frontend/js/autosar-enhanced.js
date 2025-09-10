@@ -705,8 +705,10 @@ class EnhancedAutoSAR {
 
             // Generate enhanced report
             const response = await api.generateSARReport(reportData);
+            console.log('🔍 Auto-SAR: API response:', response);
             
             if (response.status === 'success') {
+                console.log('🔍 Auto-SAR: SAR report from API:', response.sar_report);
                 this.currentReport = this.enhanceReportWithAI(response.sar_report);
                 this.renderAdvancedReport(this.currentReport);
                 showNotification(`Enhanced SAR report generated with AI insights`, 'success');
@@ -722,6 +724,14 @@ class EnhancedAutoSAR {
     }
 
     enhanceReportWithAI(baseReport) {
+        // Validate base report
+        if (!baseReport) {
+            console.error('❌ Auto-SAR: baseReport is undefined or null');
+            throw new Error('Base report is required for enhancement');
+        }
+
+        console.log('🔍 Auto-SAR: Enhancing report with AI data:', baseReport);
+
         // Enhance the base report with AI analysis data
         return {
             ...baseReport,
@@ -745,6 +755,31 @@ class EnhancedAutoSAR {
     renderAdvancedReport(report) {
         const container = document.getElementById('sar-report');
         if (!container) return;
+
+        // Validate report object and required properties
+        if (!report) {
+            console.error('❌ Auto-SAR: Report object is undefined or null');
+            container.innerHTML = '<div class="error-message">Error: No report data available</div>';
+            return;
+        }
+
+        if (!report.report_id) {
+            console.error('❌ Auto-SAR: report_id is missing from report object', report);
+            container.innerHTML = '<div class="error-message">Error: Report ID is missing</div>';
+            return;
+        }
+
+        // Ensure ai_analysis exists
+        if (!report.ai_analysis) {
+            console.warn('⚠️ Auto-SAR: ai_analysis missing, using defaults');
+            report.ai_analysis = {
+                confidence_score: 0,
+                risk_score: 0,
+                patterns_detected: [],
+                main_patterns: [],
+                risk_factors: []
+            };
+        }
 
         container.innerHTML = `
             <div class="enhanced-sar-report">

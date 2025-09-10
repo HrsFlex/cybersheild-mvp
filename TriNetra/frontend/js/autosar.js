@@ -195,6 +195,19 @@ class AutoSAR {
         const container = document.getElementById('sar-report');
         if (!container) return;
 
+        // Validate report object and required properties
+        if (!report) {
+            console.error('❌ Auto-SAR: Report object is undefined or null');
+            container.innerHTML = '<div class="error-message">Error: No report data available</div>';
+            return;
+        }
+
+        if (!report.report_id) {
+            console.error('❌ Auto-SAR: report_id is missing from report object', report);
+            container.innerHTML = '<div class="error-message">Error: Report ID is missing</div>';
+            return;
+        }
+
         container.innerHTML = `
             <div class="sar-report-content">
                 <!-- Report Header -->
