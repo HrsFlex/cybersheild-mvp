@@ -1,11 +1,14 @@
 export async function initSarMap() {
+    // Remove existing map container if present
     const existingMap = document.getElementById('sar-map');
     if (existingMap) existingMap.remove();
 
+    // Create new map container
     const mapContainer = document.createElement('div');
     mapContainer.id = 'sar-map';
     mapContainer.style.width = '100%';
-    mapContainer.style.height = '500px';
+    mapContainer.style.height = '500px';          // fixed height
+    mapContainer.style.minHeight = '400px';       // optional min-height
     mapContainer.style.marginTop = '10px';
     mapContainer.style.border = '2px solid #00ff87';
     mapContainer.style.borderRadius = '8px';
@@ -40,6 +43,31 @@ export async function initSarMap() {
         return div;
     };
     legend.addTo(sarMap);
+
+    const fullscreenBtn = document.createElement("button");
+    fullscreenBtn.textContent = "⛶ Fullscreen";
+    fullscreenBtn.style.position = "absolute";
+    fullscreenBtn.style.top = "10px";
+    fullscreenBtn.style.right = "10px";
+    fullscreenBtn.style.zIndex = "1000";
+    fullscreenBtn.style.padding = "6px 12px";
+    fullscreenBtn.style.border = "none";
+    fullscreenBtn.style.borderRadius = "6px";
+    fullscreenBtn.style.cursor = "pointer";
+
+    mapContainer.appendChild(fullscreenBtn);
+
+    fullscreenBtn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+            mapContainer.requestFullscreen().then(() => {
+                setTimeout(() => sarMap.invalidateSize(), 300); // resize after entering
+            });
+        } else {
+            document.exitFullscreen().then(() => {
+                setTimeout(() => sarMap.invalidateSize(), 300); // resize after exit
+            });
+        }
+    });
 
     try {
         const response = await fetch('/api/autosar/generate', {

@@ -58,39 +58,58 @@ export function getSuspicionColor(score) {
     }
 }
 
+
+const notifications = []; // keep track of active notifications
 // Create notification
-export function showNotification(message, type = 'info') {
+export function showNotification(message, type = 'info', duration = 5000) {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.textContent = message;
-    
-    // Style the notification
+
     Object.assign(notification.style, {
         position: 'fixed',
-        top: '20px',
+        top: `${20 + notifications.length * 70}px`, // stack with gap
         right: '20px',
         padding: '1rem 1.5rem',
-        borderRadius: '6px',
-        color: 'white',
+        borderRadius: '12px',
+        color: '#ffffff',
         zIndex: '9999',
-        maxWidth: '300px',
-        fontSize: '0.9rem',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-        backgroundColor: type === 'error' ? '#ff4757' : 
-                         type === 'success' ? '#00ff87' : 
-                         type === 'warning' ? '#ffa502' : '#00d4ff'
+        maxWidth: '320px',
+        fontSize: '1rem',
+        fontWeight: '500',
+        lineHeight: '1.4',
+        transition: 'transform 0.3s ease, opacity 0.3s ease, top 0.3s ease',
+        transform: 'translateY(-20px)',
+        opacity: '0',
+        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.2)',
+        backdropFilter: 'blur(10px)',
+        backgroundColor: type === 'error' ? '#ff6b6b' :
+                         type === 'success' ? '#2ed573' :
+                         type === 'warning' ? '#ffa502' : '#1e90ff'
     });
-    
-    document.body.appendChild(notification);
-    
-    // Remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 5000);
-}
 
+    document.body.appendChild(notification);
+    notifications.push(notification);
+
+    requestAnimationFrame(() => {
+        notification.style.transform = 'translateY(0)';
+        notification.style.opacity = '1';
+    });
+
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.addEventListener('transitionend', () => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+                notifications.splice(notifications.indexOf(notification), 1);
+                // reposition remaining notifications
+                notifications.forEach((n, i) => {
+                    n.style.top = `${20 + i * 70}px`;
+                });
+            }
+        });
+    }, duration);
+}
 // Debounce function
 export function debounce(func, wait) {
     let timeout;
