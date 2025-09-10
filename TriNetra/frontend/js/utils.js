@@ -15,11 +15,11 @@ export function hideLoading() {
     }
 }
 
-// Format currency
+// Format currency in Indian Rupees
 export function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'INR'
     }).format(amount);
 }
 

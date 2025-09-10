@@ -38,31 +38,61 @@ class ChronosTimeline {
             .attr('class', 'chronos-explanation')
             .html(`
                 <div class="explanation-header">
-                    <h4>🕐 What is CHRONOS?</h4>
-                    <p><strong>CHRONOS</strong> is a time-lapse visualization system that reveals money laundering patterns over time.</p>
-                    <p class="start-instruction">👆 <strong>Click the "▶️ Play" button above to start the animation!</strong></p>
+                    <h4>📊 CHRONOS: Transaction Timeline Analysis</h4>
+                    <p>Interactive time-based visualization of financial transactions and patterns.</p>
+                    <p class="start-instruction">👆 <strong>Click Play to start the timeline animation</strong></p>
                 </div>
                 <div class="explanation-content">
                     <div class="explanation-item">
                         <span class="emoji">🎬</span>
-                        <strong>Time-Lapse Animation:</strong> Click Play to watch financial transactions unfold chronologically
+                        <div>
+                            <strong>Time-Lapse Animation:</strong>
+                            <span>Watch transactions unfold chronologically over time</span>
+                        </div>
                     </div>
                     <div class="explanation-item">
                         <span class="emoji">🔴</span>
-                        <strong>Risk Indicators:</strong> Red dots = High suspicion, Yellow = Medium risk, Green = Normal transactions
+                        <div>
+                            <strong>Risk Indicators:</strong>
+                            <span>Red = High suspicion, Yellow = Medium risk, Blue = Normal</span>
+                        </div>
                     </div>
                     <div class="explanation-item">
                         <span class="emoji">⚡</span>
-                        <strong>Speed Control:</strong> Adjust animation speed (1x-50x) to focus on details or get quick overviews
+                        <div>
+                            <strong>Speed Control:</strong>
+                            <span>Adjust animation speed from 1x to 50x for detailed analysis</span>
+                        </div>
                     </div>
                     <div class="explanation-item">
                         <span class="emoji">🔍</span>
-                        <strong>Interactive:</strong> Click on transactions to see details and trace money flows between accounts
+                        <div>
+                            <strong>Interactive Details:</strong>
+                            <span>Hover over transactions to see detailed information</span>
+                        </div>
                     </div>
                 </div>
             `);
         
-        // Create SVG
+        // Add status bar
+        container.append('div')
+            .attr('class', 'status-bar')
+            .html(`
+                <div class="status-item">
+                    <span class="status-label">Total Transactions:</span>
+                    <span class="status-value" id="total-count">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Suspicious:</span>
+                    <span class="status-value" id="suspicious-count">0</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Risk Level:</span>
+                    <span class="status-value" id="risk-level">LOW</span>
+                </div>
+            `);
+        
+        // Create clean SVG
         this.width = Math.max(this.container.clientWidth - this.margin.left - this.margin.right, 600);
         
         this.svg = container
@@ -97,8 +127,20 @@ class ChronosTimeline {
             .attr('x', 0 - (this.height / 2))
             .attr('dy', '1em')
             .style('text-anchor', 'middle')
-            .style('fill', 'var(--text-gray)')
-            .text('Transaction Amount ($)');
+            .style('fill', 'var(--text-light)')
+            .text('Transaction Amount (₹)');
+
+        this.g.append('text')
+            .attr('class', 'axis-label')
+            .attr('transform', `translate(${this.width / 2}, ${this.height + 35})`)
+            .style('text-anchor', 'middle')
+            .style('fill', 'var(--text-light)')
+            .text('Time');
+
+        // Create tooltip
+        this.tooltip = d3.select('body').append('div')
+            .attr('class', 'tooltip')
+            .style('opacity', 0);
 
         this.g.append('text')
             .attr('class', 'axis-label')
@@ -120,16 +162,24 @@ class ChronosTimeline {
             .style('z-index', '1000')
             .style('opacity', 0);
 
-        // Add keyboard shortcuts help
+        // Add info panel
+        container.append('div')
+            .attr('class', 'timeline-info')
+            .html(`
+                <h4>📊 Transaction Analysis</h4>
+                <p>Hover over any transaction point to see detailed information</p>
+            `);
+            
+        // Add keyboard shortcuts
         container.append('div')
             .attr('class', 'shortcuts-info')
             .html(`
-                <h6>⌨️ Keyboard Shortcuts</h6>
+                <h6>⌨️ Keyboard Controls</h6>
                 <ul>
-                    <li><kbd>Space</kbd> Play/Pause</li>
-                    <li><kbd>R</kbd> Reset</li>
-                    <li><kbd>T</kbd> Timeline View</li>
-                    <li><kbd>N</kbd> Network View</li>
+                    <li><kbd>Space</kbd> <span>Play/Pause</span></li>
+                    <li><kbd>R</kbd> <span>Reset</span></li>
+                    <li><kbd>T</kbd> <span>Timeline View</span></li>
+                    <li><kbd>N</kbd> <span>Network View</span></li>
                 </ul>
             `);
     }
@@ -255,8 +305,61 @@ class ChronosTimeline {
             `);
     }
 
+    updateStatusBar() {
+        if (!this.data || this.data.length === 0) return;
+        
+        const suspiciousCount = this.data.filter(d => d.suspicious_score > 0.5).length;
+        const criticalCount = this.data.filter(d => d.suspicious_score > 0.8).length;
+        const threatPercentage = (suspiciousCount / this.data.length) * 100;
+        
+        let riskLevel, riskClass;
+        if (criticalCount > 0) {
+            riskLevel = 'HIGH';
+            riskClass = 'critical';
+        } else if (threatPercentage > 25) {
+            riskLevel = 'MEDIUM';
+            riskClass = 'medium';
+        } else if (threatPercentage > 10) {
+            riskLevel = 'LOW';
+            riskClass = 'low';
+        } else {
+            riskLevel = 'MINIMAL';
+            riskClass = 'low';
+        }
+        
+        const totalElement = document.getElementById('total-count');
+        const suspiciousElement = document.getElementById('suspicious-count');
+        const riskElement = document.getElementById('risk-level');
+        
+        if (totalElement) totalElement.textContent = this.data.length;
+        if (suspiciousElement) {
+            suspiciousElement.textContent = suspiciousCount;
+            suspiciousElement.className = suspiciousCount > 0 ? 'status-value alert' : 'status-value';
+        }
+        if (riskElement) {
+            riskElement.textContent = riskLevel;
+            riskElement.className = `status-value ${riskClass}`;
+        }
+    }
+    
+    showNoDataState() {
+        const infoPanel = d3.select(`#${this.containerId} .timeline-info`);
+        if (!infoPanel.empty()) {
+            infoPanel.html(`
+                <h4>⚠️ No Data Available</h4>
+                <p>No transaction data found for the selected scenario. Please try a different filter or check the data source.</p>
+            `);
+        }
+    }
+
     render() {
-        if (!this.data.length) return;
+        if (!this.data.length) {
+            this.showNoDataState();
+            return;
+        }
+
+        // Update status bar
+        this.updateStatusBar();
 
         // Clear any existing content first (important for view switching)
         this.g.selectAll('*').remove();
@@ -278,7 +381,7 @@ class ChronosTimeline {
             .attr('dy', '1em')
             .style('text-anchor', 'middle')
             .style('fill', 'var(--text-gray)')
-            .text('Transaction Amount ($)');
+            .text('Transaction Amount (₹)');
 
         this.g.append('text')
             .attr('class', 'axis-label')
@@ -395,20 +498,48 @@ class ChronosTimeline {
     }
 
     showTooltip(event, d) {
+        const suspicionScore = (d.suspicious_score * 100).toFixed(1);
+        let riskClass = 'normal';
+        if (d.suspicious_score > 0.8) riskClass = 'critical';
+        else if (d.suspicious_score > 0.5) riskClass = 'suspicious';
+        
         this.tooltip
             .style('opacity', 1)
             .html(`
-                <strong>Transaction: ${d.id}</strong><br/>
-                <strong>Amount:</strong> ${formatCurrency(d.amount)}<br/>
-                <strong>Time:</strong> ${formatDateTime(d.timestamp)}<br/>
-                <strong>From:</strong> ${d.from_account}<br/>
-                <strong>To:</strong> ${d.to_account}<br/>
-                <strong>Suspicion:</strong> ${(d.suspicious_score * 100).toFixed(1)}%<br/>
-                <strong>Pattern:</strong> ${d.pattern_type}<br/>
-                <strong>Scenario:</strong> ${d.scenario}
+                <h6>Transaction Details</h6>
+                <div class="detail-row">
+                    <span class="detail-label">ID:</span>
+                    <span class="detail-value">${d.id || d.transaction_id}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value">${formatCurrency(d.amount)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value">${formatDateTime(d.timestamp)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">From:</span>
+                    <span class="detail-value">${d.from_account}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">To:</span>
+                    <span class="detail-value">${d.to_account}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Risk Score:</span>
+                    <span class="detail-value ${riskClass}">${suspicionScore}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Scenario:</span>
+                    <span class="detail-value">${d.scenario || 'Unknown'}</span>
+                </div>
             `)
-            .style('left', (event.pageX + 10) + 'px')
+            .style('left', (event.pageX + 15) + 'px')
             .style('top', (event.pageY - 10) + 'px');
+        
+        // Don't update info panel on hover - only show tooltip
     }
 
     hideTooltip() {
@@ -432,23 +563,35 @@ class ChronosTimeline {
     }
 
     updateTimelineInfo(selectedTransaction = null) {
-        const infoContainer = document.getElementById('timeline-info');
-        if (!infoContainer) return;
+        const infoPanel = d3.select(`#${this.containerId} .timeline-info`);
+        if (infoPanel.empty()) return;
 
         if (selectedTransaction) {
-            infoContainer.innerHTML = `
-                <h4>Transaction Details</h4>
+            const suspicionScore = (selectedTransaction.suspicious_score * 100).toFixed(1);
+            let riskLevel = 'Normal';
+            let riskClass = 'normal';
+            
+            if (selectedTransaction.suspicious_score > 0.8) {
+                riskLevel = 'Critical';
+                riskClass = 'critical';
+            } else if (selectedTransaction.suspicious_score > 0.5) {
+                riskLevel = 'Suspicious';
+                riskClass = 'suspicious';
+            }
+            
+            infoPanel.html(`
+                <h4>🔍 Selected Transaction Analysis</h4>
                 <div class="transaction-details">
                     <div class="detail-item">
                         <div class="detail-label">Transaction ID</div>
-                        <div class="detail-value">${selectedTransaction.id}</div>
+                        <div class="detail-value">${selectedTransaction.id || selectedTransaction.transaction_id}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Amount</div>
                         <div class="detail-value">${formatCurrency(selectedTransaction.amount)}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Timestamp</div>
+                        <div class="detail-label">Date & Time</div>
                         <div class="detail-value">${formatDateTime(selectedTransaction.timestamp)}</div>
                     </div>
                     <div class="detail-item">
@@ -460,23 +603,20 @@ class ChronosTimeline {
                         <div class="detail-value">${selectedTransaction.to_account}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">Suspicion Score</div>
-                        <div class="detail-value">${(selectedTransaction.suspicious_score * 100).toFixed(1)}%</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Pattern Type</div>
-                        <div class="detail-value">${selectedTransaction.pattern_type}</div>
+                        <div class="detail-label">Risk Assessment</div>
+                        <div class="detail-value ${riskClass}">${riskLevel} (${suspicionScore}%)</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Scenario</div>
-                        <div class="detail-value">${selectedTransaction.scenario}</div>
+                        <div class="detail-value">${selectedTransaction.scenario || 'Unknown'}</div>
                     </div>
                 </div>
-            `;
+            `);
         } else {
+            // Show overview statistics when no transaction is selected
             const stats = this.calculateStats();
-            infoContainer.innerHTML = `
-                <h4>Timeline Overview - ${this.currentScenario}</h4>
+            infoPanel.html(`
+                <h4>📊 Timeline Overview - ${this.currentScenario}</h4>
                 <div class="transaction-details">
                     <div class="detail-item">
                         <div class="detail-label">Total Transactions</div>
@@ -503,7 +643,8 @@ class ChronosTimeline {
                         <div class="detail-value">${(stats.avgSuspicion * 100).toFixed(1)}%</div>
                     </div>
                 </div>
-            `;
+                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Click on any transaction point to see detailed analysis information.</p>
+            `);
         }
     }
 
