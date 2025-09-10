@@ -1,2 +1,5 @@
 CLAUDE.md
 .vercel
+**/__pycache__/
+**/.venv/
+**/node_modules/
