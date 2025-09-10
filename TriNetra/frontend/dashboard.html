@@ -51,6 +51,25 @@
                 <div class="section-header">
                     <h2>🕐 CHRONOS Timeline</h2>
                     <div class="chronos-controls">
+                        <div class="time-quantum-group">
+                            <label for="time-quantum">Time Period:</label>
+                            <select id="time-quantum" class="time-quantum-select">
+                                <option value="1m">1 Month</option>
+                                <option value="6m">6 Months</option>
+                                <option value="1y">1 Year</option>
+                                <option value="3y">3 Years</option>
+                            </select>
+                        </div>
+                        <div class="search-group">
+                            <input type="text" id="transaction-search" placeholder="Search transactions..." class="search-input">
+                            <select id="search-type" class="search-type-select">
+                                <option value="all">All Fields</option>
+                                <option value="id">Transaction ID</option>
+                                <option value="account">Account</option>
+                                <option value="amount">Amount</option>
+                            </select>
+                            <button id="search-button" class="control-button">🔍 Search</button>
+                        </div>
                         <button id="play-button" class="control-button">▶️ Play</button>
                         <button id="pause-button" class="control-button">⏸️ Pause</button>
                         <button id="reset-button" class="control-button">🔄 Reset</button>

@@ -13,6 +13,7 @@ class ChronosTimeline {
         this.margin = { top: 20, right: 30, bottom: 40, left: 50 };
         this.data = [];
         this.currentScenario = 'all';
+        this.timeQuantum = '1m'; // New time quantum selection
         this.isPlaying = false;
         this.speed = 10;
         this.currentFrame = 0;
@@ -21,9 +22,12 @@ class ChronosTimeline {
         this.selectedNode = null;
         this.networkNodes = [];
         this.networkLinks = [];
+        this.searchResults = []; // Store search results
+        this.searchModal = null; // Search results modal
         
         this.setupTimeline();
         this.setupControls();
+        this.setupSearchModal();
     }
 
     setupTimeline() {
@@ -180,8 +184,43 @@ class ChronosTimeline {
                     <li><kbd>R</kbd> <span>Reset</span></li>
                     <li><kbd>T</kbd> <span>Timeline View</span></li>
                     <li><kbd>N</kbd> <span>Network View</span></li>
+                    <li><kbd>Ctrl+F</kbd> <span>Search</span></li>
                 </ul>
             `);
+    }
+
+    setupSearchModal() {
+        // Create search results modal
+        this.searchModal = d3.select('body').append('div')
+            .attr('class', 'search-modal hidden')
+            .style('position', 'fixed')
+            .style('top', '50%')
+            .style('left', '50%')
+            .style('transform', 'translate(-50%, -50%)')
+            .style('background', 'var(--color-dark-light)')
+            .style('border', '1px solid var(--color-primary)')
+            .style('border-radius', 'var(--radius-xl)')
+            .style('padding', 'var(--space-8)')
+            .style('max-width', '800px')
+            .style('max-height', '600px')
+            .style('overflow-y', 'auto')
+            .style('z-index', 'var(--z-modal)')
+            .style('box-shadow', 'var(--shadow-2xl)');
+
+        // Add modal content structure
+        this.searchModal.append('div')
+            .attr('class', 'search-modal-header')
+            .html(`
+                <h3>🔍 Transaction Search Results</h3>
+                <button class="close-search-modal" style="float: right; background: none; border: none; color: var(--color-light); font-size: 24px; cursor: pointer;">&times;</button>
+            `);
+
+        this.searchModal.append('div')
+            .attr('class', 'search-modal-content');
+
+        // Add event listener to close modal
+        this.searchModal.select('.close-search-modal')
+            .on('click', () => this.hideSearchModal());
     }
 
     setupControls() {
@@ -192,6 +231,12 @@ class ChronosTimeline {
         const speedDisplay = document.getElementById('speed-display');
         const timelineView = document.getElementById('timeline-view');
         const networkView = document.getElementById('network-view');
+        
+        // New controls
+        const timeQuantumSelect = document.getElementById('time-quantum');
+        const transactionSearch = document.getElementById('transaction-search');
+        const searchButton = document.getElementById('search-button');
+        const searchType = document.getElementById('search-type');
 
         if (playButton) {
             playButton.addEventListener('click', () => this.play());
@@ -227,9 +272,31 @@ class ChronosTimeline {
             exportButton.addEventListener('click', () => this.exportReport());
         }
 
+        // Time quantum control
+        if (timeQuantumSelect) {
+            timeQuantumSelect.addEventListener('change', (e) => {
+                this.timeQuantum = e.target.value;
+                this.loadData(this.currentScenario);
+                showNotification(`Time period changed to ${e.target.selectedOptions[0].text}`, 'info');
+            });
+        }
+
+        // Search controls
+        if (searchButton) {
+            searchButton.addEventListener('click', () => this.searchTransactions());
+        }
+
+        if (transactionSearch) {
+            transactionSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.searchTransactions();
+                }
+            });
+        }
+
         // Add keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT') return; // Don't interfere with input fields
+            if (e.target.tagName === 'INPUT' && !e.ctrlKey) return; // Don't interfere with input fields
             
             switch(e.key) {
                 case ' ':
@@ -249,6 +316,15 @@ class ChronosTimeline {
                 case 'N':
                     this.switchView('network');
                     break;
+                case 'f':
+                case 'F':
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        if (transactionSearch) {
+                            transactionSearch.focus();
+                        }
+                    }
+                    break;
             }
         });
     }
@@ -258,23 +334,28 @@ class ChronosTimeline {
             showLoading();
             this.currentScenario = scenario;
             
-            console.log(`🔄 CHRONOS: Loading data for scenario: ${scenario}`);
-            const response = await api.getTimelineData(scenario);
+            console.log(`🔄 CHRONOS: Loading data for scenario: ${scenario}, time quantum: ${this.timeQuantum}`);
+            const response = await api.getTimelineData(scenario, this.timeQuantum);
             console.log('📊 CHRONOS: API Response:', response);
             
             if (response.status === 'success' && response.data) {
                 console.log(`📈 CHRONOS: Raw data received: ${response.data.length} transactions`);
-                this.data = parseTransactionData(response.data);
+                this.data = this.parseEnhancedTransactionData(response.data);
                 console.log(`✅ CHRONOS: Parsed data: ${this.data.length} transactions`);
                 
                 if (this.data.length > 0) {
                     this.render();
-                    const notificationMessage = response.message && response.message.includes('Demo mode') 
-                        ? `Demo: Loaded ${this.data.length} sample transactions` 
-                        : `Loaded ${this.data.length} transactions for ${scenario}`;
+                    const timeRange = response.date_range ? 
+                        `(${new Date(response.date_range.start).toLocaleDateString()} - ${new Date(response.date_range.end).toLocaleDateString()})` : '';
+                    const notificationMessage = `Loaded ${this.data.length} transactions for ${scenario} ${timeRange}`;
                     showNotification(notificationMessage, 'success');
+                    
+                    // Display layering summary if available
+                    if (response.layering_summary) {
+                        this.displayLayeringSummary(response.layering_summary);
+                    }
                 } else {
-                    throw new Error('No transaction data available for this scenario');
+                    throw new Error('No transaction data available for this scenario and time period');
                 }
             } else {
                 throw new Error(response.message || 'Failed to load timeline data');
@@ -303,6 +384,385 @@ class ChronosTimeline {
                     </button>
                 </div>
             `);
+    }
+
+    parseEnhancedTransactionData(rawData) {
+        return rawData.map(tx => {
+            // Enhanced parsing with new fields
+            const parsedTx = parseTransactionData([tx])[0];
+            
+            // Add enhanced fields
+            parsedTx.aadhar_location = tx.aadhar_location || {};
+            parsedTx.layering_analysis = tx.layering_analysis || {};
+            parsedTx.country_risk_level = tx.country_risk_level || { level: 1, description: 'Low Risk', color: '#44ff44' };
+            parsedTx.transaction_method = tx.transaction_method || 'Unknown';
+            parsedTx.bank_details = tx.bank_details || {};
+            
+            return parsedTx;
+        });
+    }
+
+    async searchTransactions() {
+        const searchInput = document.getElementById('transaction-search');
+        const searchTypeSelect = document.getElementById('search-type');
+        
+        if (!searchInput || !searchInput.value.trim()) {
+            showNotification('Please enter a search term', 'warning');
+            return;
+        }
+        
+        const searchTerm = searchInput.value.trim();
+        const searchType = searchTypeSelect ? searchTypeSelect.value : 'all';
+        
+        try {
+            showLoading();
+            console.log(`🔍 CHRONOS: Searching for "${searchTerm}" (type: ${searchType})`);
+            
+            const response = await api.searchTransactions(searchTerm, searchType);
+            
+            if (response.status === 'success' && response.results) {
+                this.searchResults = response.results;
+                this.displaySearchResults(response);
+                
+                if (response.results.length > 0) {
+                    showNotification(`Found ${response.results.length} matching transactions`, 'success');
+                } else {
+                    showNotification('No transactions found matching your search', 'info');
+                }
+            } else {
+                throw new Error(response.message || 'Search failed');
+            }
+        } catch (error) {
+            console.error('❌ CHRONOS Search error:', error);
+            showNotification('Search failed. Please try again.', 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    displaySearchResults(response) {
+        if (!this.searchModal) return;
+        
+        const content = this.searchModal.select('.search-modal-content');
+        content.selectAll('*').remove();
+        
+        if (response.results.length === 0) {
+            content.html(`
+                <div class="no-results">
+                    <h4>📭 No Results Found</h4>
+                    <p>No transactions match your search criteria.</p>
+                    <p><strong>Search term:</strong> "${response.search_term}"</p>
+                    <p><strong>Search type:</strong> ${response.search_type}</p>
+                </div>
+            `);
+        } else {
+            // Create search results header
+            content.append('div')
+                .attr('class', 'search-results-header')
+                .html(`
+                    <p><strong>Found ${response.results.length} transactions</strong></p>
+                    <p>Search: "${response.search_term}" in ${response.search_type}</p>
+                `);
+            
+            // Create results container
+            const resultsContainer = content.append('div')
+                .attr('class', 'search-results-container');
+            
+            // Add each result
+            response.results.forEach((result, index) => {
+                const resultDiv = resultsContainer.append('div')
+                    .attr('class', 'search-result-item')
+                    .style('border', '1px solid var(--color-gray)')
+                    .style('border-radius', 'var(--radius-lg)')
+                    .style('padding', 'var(--space-4)')
+                    .style('margin-bottom', 'var(--space-3)')
+                    .style('background', 'rgba(255, 255, 255, 0.02)')
+                    .style('cursor', 'pointer')
+                    .on('click', () => this.highlightSearchResult(result));
+                
+                resultDiv.html(this.formatSearchResult(result, index + 1));
+            });
+        }
+        
+        this.showSearchModal();
+    }
+
+    formatSearchResult(result, index) {
+        const suspicionLevel = result.suspicious_score > 0.8 ? 'CRITICAL' : 
+                              result.suspicious_score > 0.5 ? 'SUSPICIOUS' : 'NORMAL';
+        const suspicionClass = suspicionLevel.toLowerCase();
+        
+        return `
+            <div class="search-result-header">
+                <h5>#${index} - Transaction ${result.id}</h5>
+                <span class="suspicion-badge ${suspicionClass}">${suspicionLevel}</span>
+            </div>
+            <div class="search-result-details">
+                <div class="detail-row">
+                    <span class="detail-label">Amount:</span>
+                    <span class="detail-value">${formatCurrency(result.amount)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value">${formatDateTime(result.timestamp)}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">From:</span>
+                    <span class="detail-value">${result.from_account}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">To:</span>
+                    <span class="detail-value">${result.to_account}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Location:</span>
+                    <span class="detail-value">${result.aadhar_location ? 
+                        `${result.aadhar_location.city}, ${result.aadhar_location.state}, ${result.aadhar_location.country}` : 
+                        'Unknown'}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Method:</span>
+                    <span class="detail-value">${result.transaction_method}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Risk Score:</span>
+                    <span class="detail-value ${suspicionClass}">${(result.suspicious_score * 100).toFixed(1)}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Country Risk:</span>
+                    <span class="detail-value" style="color: ${result.country_risk_level.color}">
+                        ${result.country_risk_level.description}
+                    </span>
+                </div>
+                ${result.layering_analysis && result.layering_analysis.layer_3_integration ? 
+                    `<div class="detail-row">
+                        <span class="detail-label">Threat Level:</span>
+                        <span class="detail-value">${result.layering_analysis.layer_3_integration.threat_level}</span>
+                    </div>` : ''}
+            </div>
+            <div class="search-result-actions">
+                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); window.TriNetra.getChronos().showDetailedAnalysis('${result.id}')">
+                    📊 Detailed Analysis
+                </button>
+            </div>
+        `;
+    }
+
+    highlightSearchResult(result) {
+        // Close search modal
+        this.hideSearchModal();
+        
+        // Find and highlight the transaction in the timeline
+        if (this.data && this.data.length > 0) {
+            const transaction = this.data.find(tx => tx.id === result.id);
+            if (transaction) {
+                this.selectTransaction(transaction);
+                showNotification(`Highlighted transaction ${result.id}`, 'info');
+            } else {
+                showNotification('Transaction not visible in current timeline', 'warning');
+            }
+        }
+    }
+
+    showDetailedAnalysis(transactionId) {
+        const result = this.searchResults.find(r => r.id === transactionId);
+        if (!result) return;
+        
+        // Create detailed analysis modal
+        const analysisModal = d3.select('body').append('div')
+            .attr('class', 'analysis-modal')
+            .style('position', 'fixed')
+            .style('top', '50%')
+            .style('left', '50%')
+            .style('transform', 'translate(-50%, -50%)')
+            .style('background', 'var(--color-dark-light)')
+            .style('border', '1px solid var(--color-primary)')
+            .style('border-radius', 'var(--radius-xl)')
+            .style('padding', 'var(--space-8)')
+            .style('max-width', '900px')
+            .style('max-height', '80vh')
+            .style('overflow-y', 'auto')
+            .style('z-index', 'var(--z-modal)')
+            .style('box-shadow', 'var(--shadow-2xl)');
+        
+        analysisModal.html(this.formatDetailedAnalysis(result));
+        
+        // Add close button functionality
+        analysisModal.select('.close-analysis-modal')
+            .on('click', () => analysisModal.remove());
+    }
+
+    formatDetailedAnalysis(result) {
+        return `
+            <div class="analysis-modal-header">
+                <h3>🔍 Detailed Transaction Analysis</h3>
+                <button class="close-analysis-modal" style="float: right; background: none; border: none; color: var(--color-light); font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div class="analysis-content">
+                <div class="analysis-section">
+                    <h4>📊 Basic Information</h4>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <strong>Transaction ID:</strong> ${result.id}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Amount:</strong> ${formatCurrency(result.amount)}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Date & Time:</strong> ${formatDateTime(result.timestamp)}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Method:</strong> ${result.transaction_method}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h4>🏦 Account Details</h4>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <strong>From Account:</strong> ${result.from_account}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>To Account:</strong> ${result.to_account}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Bank:</strong> ${result.bank_details.bank_name || 'Unknown'}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>IFSC Code:</strong> ${result.bank_details.ifsc_code || 'Unknown'}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h4>📍 Location Analysis</h4>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <strong>City:</strong> ${result.aadhar_location.city || 'Unknown'}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>State/Region:</strong> ${result.aadhar_location.state || 'Unknown'}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Country:</strong> ${result.aadhar_location.country || 'Unknown'}
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Country Risk:</strong> 
+                            <span style="color: ${result.country_risk_level.color}">
+                                ${result.country_risk_level.description}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analysis-section">
+                    <h4>🔍 Layering Analysis</h4>
+                    ${this.formatLayeringAnalysis(result.layering_analysis)}
+                </div>
+                
+                <div class="analysis-section">
+                    <h4>⚠️ Risk Assessment</h4>
+                    <div class="risk-assessment">
+                        <div class="risk-score" style="color: ${result.suspicious_score > 0.8 ? '#ff4444' : 
+                                                             result.suspicious_score > 0.5 ? '#ffaa00' : '#44ff44'}">
+                            Risk Score: ${(result.suspicious_score * 100).toFixed(1)}%
+                        </div>
+                        <div class="risk-level">
+                            Threat Level: ${result.layering_analysis.layer_3_integration?.threat_level || 'LOW'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    formatLayeringAnalysis(layering) {
+        if (!layering) return '<p>No layering analysis available</p>';
+        
+        return `
+            <div class="layering-layers">
+                <div class="layer-item">
+                    <h5>Layer 1: ${layering.layer_1_extraction?.description || 'Data Extraction'}</h5>
+                    <ul>
+                        ${(layering.layer_1_extraction?.patterns_detected || []).map(p => `<li>${p}</li>`).join('')}
+                        ${(layering.layer_1_extraction?.risk_indicators || []).map(r => `<li style="color: #ffaa00">${r}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="layer-item">
+                    <h5>Layer 2: ${layering.layer_2_processing?.description || 'Pattern Processing'}</h5>
+                    <ul>
+                        <li>Connected Accounts: ${layering.layer_2_processing?.connected_accounts || 0}</li>
+                        ${(layering.layer_2_processing?.temporal_patterns || []).map(p => `<li>${p}</li>`).join('')}
+                        ${(layering.layer_2_processing?.amount_patterns || []).map(p => `<li>${p}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="layer-item">
+                    <h5>Layer 3: ${layering.layer_3_integration?.description || 'Integration Analysis'}</h5>
+                    <ul>
+                        <li>Threat Level: <strong>${layering.layer_3_integration?.threat_level || 'LOW'}</strong></li>
+                        <li>Geolocation Risk: ${layering.layer_3_integration?.geolocation_risk || 'NORMAL'}</li>
+                        <li>Confidence: ${((layering.layer_3_integration?.pattern_match_confidence || 0) * 100).toFixed(1)}%</li>
+                    </ul>
+                </div>
+            </div>
+        `;
+    }
+
+    displayLayeringSummary(summary) {
+        // Display layering summary in the info panel
+        const infoContainer = document.getElementById('timeline-info');
+        if (!infoContainer) return;
+        
+        const summaryDiv = document.createElement('div');
+        summaryDiv.className = 'layering-summary';
+        summaryDiv.innerHTML = `
+            <h4>🔍 Layering Analysis Summary</h4>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total Transactions:</span>
+                    <span class="stat-value">${summary.total_transactions}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Critical Risk:</span>
+                    <span class="stat-value critical">${summary.risk_distribution.critical}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Medium Risk:</span>
+                    <span class="stat-value suspicious">${summary.risk_distribution.medium}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Low Risk:</span>
+                    <span class="stat-value normal">${summary.risk_distribution.low}</span>
+                </div>
+            </div>
+            <div class="effectiveness-metrics">
+                <h5>Detection Effectiveness:</h5>
+                <div class="metric-item">
+                    Layer 1: ${(summary.layering_effectiveness.layer_1_detection_rate * 100).toFixed(1)}%
+                </div>
+                <div class="metric-item">
+                    Layer 2: ${(summary.layering_effectiveness.layer_2_processing_rate * 100).toFixed(1)}%
+                </div>
+                <div class="metric-item">
+                    Layer 3: ${(summary.layering_effectiveness.layer_3_integration_rate * 100).toFixed(1)}%
+                </div>
+            </div>
+        `;
+        
+        infoContainer.insertBefore(summaryDiv, infoContainer.firstChild);
+    }
+
+    showSearchModal() {
+        if (this.searchModal) {
+            this.searchModal.classed('hidden', false);
+        }
+    }
+
+    hideSearchModal() {
+        if (this.searchModal) {
+            this.searchModal.classed('hidden', true);
+        }
     }
 
     updateStatusBar() {
