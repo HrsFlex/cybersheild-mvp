@@ -3,42 +3,58 @@ from datetime import datetime, timedelta
 import sqlite3
 import sys
 import os
+import random
+import json
+
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from config import Config
 
 autosar_bp = Blueprint('autosar', __name__)
 
+base_dir = os.path.dirname(__file__)
+with open(os.path.join(base_dir, "../data/simplemap.json"), "r", encoding="utf-8") as f:
+    india_cities = json.load(f)
+
+def random_india_location():
+    """Pick a random city from the simplemap JSON"""
+    city = random.choice(india_cities)
+    return {
+        "lat": float(city["lat"]),
+        "lon": float(city["lng"]),
+        "city": city["city"]
+    }
 class AutoSARGenerator:
     """Automated Suspicious Activity Report Generator"""
     
     def __init__(self):
+
         self.templates = {
             'terrorist_financing': {
                 'title': 'Suspected Terrorist Financing Activity',
                 'summary': 'Multiple small-value transactions from various sources converging to potential terror-linked accounts',
                 'priority': 'HIGH',
-                'regulatory_codes': ['31.a', '31.b']
+                'regulatory_codes': ['31.a', '31.b'],
             },
             'crypto_sanctions': {
                 'title': 'Sanctions Evasion via Cryptocurrency',
                 'summary': 'Large-value cryptocurrency transactions through mixing services to evade sanctions',
                 'priority': 'CRITICAL',
-                'regulatory_codes': ['20.a', '25.c']
+                'regulatory_codes': ['20.a', '25.c'],
             },
             'human_trafficking': {
                 'title': 'Human Trafficking Network Activity',
                 'summary': 'Cash-intensive transactions between front businesses and known trafficking handlers',
                 'priority': 'HIGH',
-                'regulatory_codes': ['35.a', '35.b']
+                'regulatory_codes': ['35.a', '35.b'],
             }
         }
+
     
     def generate_sar_report(self, pattern_data, transactions):
         """Generate SAR report based on detected pattern"""
         pattern_type = pattern_data.get('scenario', 'unknown')
         template = self.templates.get(pattern_type, self.templates['terrorist_financing'])
-        
         # Calculate statistics
         total_amount = sum(float(t.get('amount', 0)) for t in transactions)
         avg_amount = total_amount / len(transactions) if transactions else 0
@@ -58,7 +74,7 @@ class AutoSARGenerator:
                 'total_amount': round(total_amount, 2),
                 'average_amount': round(avg_amount, 2),
                 'time_period': self._calculate_time_period(transactions),
-                'accounts_involved': self._get_unique_accounts(transactions)
+                'accounts_involved': self._get_unique_accounts(transactions),
             },
             'evidence': {
                 'transaction_ids': [t.get('transaction_id', t.get('id', '')) for t in transactions[:10]],  # First 10
@@ -217,13 +233,17 @@ def generate_sar():
         conn.close()
         
         transactions = df.to_dict('records')
+        for t in transactions:
+            t['from_location'] = random_india_location()
+            t['to_location'] = random_india_location()
         
         # Generate SAR report
         sar_report = sar_generator.generate_sar_report(pattern_data, transactions)
         
         return jsonify({
             'status': 'success',
-            'sar_report': sar_report
+            'sar_report': sar_report,
+            'transactions': transactions
         })
         
     except Exception as e:

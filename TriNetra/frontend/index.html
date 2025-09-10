@@ -10,6 +10,12 @@
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#00ff87">
     <link rel="apple-touch-icon" href="./static/icons/icon-192x192.png">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
     
     <!-- D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -86,6 +92,7 @@
                     </div>
                 </div>
                 <div id="sar-report" class="sar-container"></div>
+                <div id="sar-map"></div>
             </section>
         </main>
 
@@ -124,5 +131,15 @@
             navigator.serviceWorker.register('./sw.js');
         }
     </script>
+
+    <!-- Leaflet SAR Map -->
+   <script type="module">
+        import { initSarMap } from './js/sar-map.js';
+
+        document.getElementById('generate-sar').addEventListener('click', () => {
+            initSarMap();
+        });
+    </script>
+
 </body>
 </html>
