@@ -6,374 +6,136 @@
     <title>TriNetra - Financial Crime Detection</title>
     <meta name="description" content="Making the invisible visible - Advanced AI-powered financial crime detection">
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#00ff87">
-    <link rel="apple-touch-icon" href="./static/icons/icon-192x192.png">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
     
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="./css/design-system.css">
-    <link rel="stylesheet" href="./css/main.css">
-    <link rel="stylesheet" href="./css/components.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff87',
+                        secondary: '#00d4ff',
+                        dark: '#0a0a0f',
+                        'dark-secondary': '#1a1a2e',
+                        'dark-accent': '#16213e'
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
     <style>
-        /* Login Page Specific Styles */
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-dark-light) 50%, var(--color-dark-lighter) 100%);
-            min-height: 100vh;
-            font-family: var(--font-family-primary);
-            overflow-x: hidden;
-        }
-
-        .login-container {
-            display: flex;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .login-left {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: var(--space-8);
-            position: relative;
-            z-index: 2;
-        }
-
-        .login-right {
-            flex: 1;
-            background: linear-gradient(135deg, rgba(0, 255, 135, 0.1), rgba(0, 212, 255, 0.1));
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: var(--space-8);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-right::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 135, 0.1) 0%, transparent 50%);
-            animation: rotate 20s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .brand-section {
-            text-align: center;
-            margin-bottom: var(--space-12);
-        }
-
-        .brand-logo {
-            font-size: var(--text-5xl);
-            font-weight: var(--font-extrabold);
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-4);
-        }
-
-        .brand-tagline {
-            color: var(--color-light);
-            font-size: var(--text-xl);
-            font-weight: var(--font-light);
-            opacity: 0.8;
-        }
-
-        .login-form {
-            background: rgba(26, 26, 46, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-10);
-            width: 100%;
-            max-width: 400px;
-            box-shadow: var(--shadow-2xl);
-        }
-
-        .form-title {
-            color: var(--color-white);
-            font-size: var(--text-2xl);
-            font-weight: var(--font-semibold);
-            text-align: center;
-            margin-bottom: var(--space-8);
-        }
-
-        .form-group {
-            margin-bottom: var(--space-6);
-        }
-
-        .form-label {
-            display: block;
-            color: var(--color-light);
-            font-size: var(--text-sm);
-            font-weight: var(--font-medium);
-            margin-bottom: var(--space-2);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: var(--space-4);
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-lg);
-            color: var(--color-white);
-            font-size: var(--text-base);
-            transition: all var(--transition-fast);
-            box-sizing: border-box;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(0, 255, 135, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: var(--color-gray-lighter);
-        }
-
-        .login-button {
-            width: 100%;
-            padding: var(--space-4);
-            background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-            border: none;
-            border-radius: var(--radius-lg);
-            color: var(--color-dark);
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg), var(--shadow-glow-green);
-        }
-
-        .login-button:active {
-            transform: translateY(0);
-        }
-
-        .intro-section {
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .intro-title {
-            font-size: var(--text-4xl);
-            font-weight: var(--font-bold);
-            color: var(--color-white);
-            margin-bottom: var(--space-6);
-        }
-
-        .intro-subtitle {
-            font-size: var(--text-xl);
-            color: var(--color-light);
-            margin-bottom: var(--space-8);
-            opacity: 0.9;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--space-6);
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-xl);
-            padding: var(--space-6);
-            text-align: left;
-            transition: all var(--transition-normal);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 255, 135, 0.3);
-        }
-
-        .feature-icon {
-            font-size: var(--text-3xl);
-            margin-bottom: var(--space-3);
-        }
-
-        .feature-title {
-            color: var(--color-white);
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
-            margin-bottom: var(--space-2);
-        }
-
-        .feature-description {
-            color: var(--color-light);
-            font-size: var(--text-sm);
-            opacity: 0.8;
-            line-height: var(--leading-relaxed);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-            }
-            
-            .login-left, .login-right {
-                flex: none;
-                min-height: 50vh;
-            }
-            
-            .brand-logo {
-                font-size: var(--text-4xl);
-            }
-            
-            .intro-title {
-                font-size: var(--text-3xl);
-            }
-        }
-
-        /* Animated Background Elements */
-        .bg-element {
-            position: absolute;
-            background: linear-gradient(135deg, rgba(0, 255, 135, 0.1), rgba(0, 212, 255, 0.1));
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .bg-element:nth-child(1) {
-            width: 300px;
-            height: 300px;
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .bg-element:nth-child(2) {
-            width: 200px;
-            height: 200px;
-            bottom: 20%;
-            right: 15%;
-            animation-delay: 2s;
-        }
-
-        .bg-element:nth-child(3) {
-            width: 150px;
-            height: 150px;
-            top: 60%;
-            left: 70%;
-            animation-delay: 4s;
-        }
-
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-                opacity: 0.1;
-            }
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.1; }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #00ff87; }
+            to { box-shadow: 0 0 30px #00ff87, 0 0 40px #00ff87; }
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
         }
     </style>
 </head>
-<body>
-    <div class="login-container">
+<body class="text-white overflow-x-hidden">
+    <div class="min-h-screen flex">
         <!-- Left Side - Login Form -->
-        <div class="login-left">
-            <div class="brand-section">
-                <div class="brand-logo">TriNetra</div>
-                <div class="brand-tagline">Making the invisible visible</div>
+        <div class="flex-1 flex flex-col justify-center items-center px-8 lg:px-16 relative z-10">
+            <div class="text-center mb-12">
+                <div class="text-6xl font-extrabold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+                    TriNetra
+                </div>
+                <div class="text-gray-300 text-xl font-light opacity-80">
+                    Making the invisible visible
+                </div>
             </div>
             
-            <form class="login-form" id="loginForm">
-                <h2 class="form-title">Secure Access</h2>
+            <form class="bg-dark-secondary/80 backdrop-blur-xl border border-white/10 rounded-3xl p-12 w-full max-w-md shadow-2xl" id="loginForm">
+                <h2 class="text-white text-3xl font-semibold text-center mb-8">Secure Access</h2>
                 
-                <div class="form-group">
-                    <label for="username" class="form-label">Username</label>
+                <div class="mb-6">
+                    <label for="username" class="block text-gray-300 text-sm font-medium mb-3">Username</label>
                     <input 
                         type="text" 
                         id="username" 
                         name="username" 
-                        class="form-input" 
+                        class="w-full p-4 bg-black/30 border-2 border-white/10 rounded-xl text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         placeholder="Enter your username"
                         required
                     >
                 </div>
                 
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
+                <div class="mb-8">
+                    <label for="password" class="block text-gray-300 text-sm font-medium mb-3">Password</label>
                     <input 
                         type="password" 
                         id="password" 
                         name="password" 
-                        class="form-input" 
+                        class="w-full p-4 bg-black/30 border-2 border-white/10 rounded-xl text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                         placeholder="Enter your password"
                         required
                     >
                 </div>
                 
-                <button type="submit" class="login-button">
+                <button type="submit" class="w-full p-4 bg-gradient-to-r from-primary to-secondary text-dark text-lg font-semibold rounded-xl hover:shadow-lg hover:shadow-primary/25 hover:scale-105 transition-all duration-300">
                     Access TriNetra System
                 </button>
+                
+                <div class="mt-6 text-center text-sm text-gray-400">
+                    Demo credentials: any username and password
+                </div>
             </form>
         </div>
         
         <!-- Right Side - Introduction -->
-        <div class="login-right">
-            <div class="bg-element"></div>
-            <div class="bg-element"></div>
-            <div class="bg-element"></div>
+        <div class="flex-1 bg-gradient-to-br from-primary/10 to-secondary/10 flex flex-col justify-center items-center px-8 lg:px-16 relative overflow-hidden">
+            <!-- Animated Background Elements -->
+            <div class="absolute top-16 left-16 w-72 h-72 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full animate-float"></div>
+            <div class="absolute bottom-20 right-20 w-48 h-48 bg-gradient-to-br from-secondary/20 to-primary/20 rounded-full animate-float" style="animation-delay: 2s;"></div>
+            <div class="absolute top-3/5 left-3/4 w-36 h-36 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full animate-float" style="animation-delay: 4s;"></div>
             
-            <div class="intro-section">
-                <h1 class="intro-title">Advanced Financial Crime Detection</h1>
-                <p class="intro-subtitle">
+            <div class="text-center relative z-10 max-w-2xl">
+                <h1 class="text-5xl lg:text-6xl font-bold text-white mb-8 leading-tight">
+                    Advanced Financial Crime Detection
+                </h1>
+                <p class="text-xl lg:text-2xl text-gray-300 mb-12 opacity-90 leading-relaxed">
                     Harness the power of AI to detect and prevent financial crimes with unprecedented accuracy
                 </p>
                 
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">🕐</div>
-                        <div class="feature-title">CHRONOS Timeline</div>
-                        <div class="feature-description">
+                <div class="grid gap-8 max-w-xl mx-auto">
+                    <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 text-left hover:bg-white/8 hover:border-primary/30 transition-all duration-300 hover:transform hover:-translate-y-2">
+                        <div class="text-4xl mb-4">🕐</div>
+                        <div class="text-white text-xl font-semibold mb-3">CHRONOS Timeline</div>
+                        <div class="text-gray-300 opacity-80 leading-relaxed">
                             Visualize transaction patterns across time with advanced temporal analysis and real-time monitoring
                         </div>
                     </div>
                     
-                    <div class="feature-card">
-                        <div class="feature-icon">🐍</div>
-                        <div class="feature-title">HYDRA AI Red-Team</div>
-                        <div class="feature-description">
+                    <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 text-left hover:bg-white/8 hover:border-red-400/30 transition-all duration-300 hover:transform hover:-translate-y-2">
+                        <div class="text-4xl mb-4">🐍</div>
+                        <div class="text-white text-xl font-semibold mb-3">HYDRA AI Red-Team</div>
+                        <div class="text-gray-300 opacity-80 leading-relaxed">
                             AI-powered adversarial testing to strengthen detection algorithms against sophisticated attacks
                         </div>
                     </div>
                     
-                    <div class="feature-card">
-                        <div class="feature-icon">📋</div>
-                        <div class="feature-title">Auto-SAR Generator</div>
-                        <div class="feature-description">
+                    <div class="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8 text-left hover:bg-white/8 hover:border-orange-400/30 transition-all duration-300 hover:transform hover:-translate-y-2">
+                        <div class="text-4xl mb-4">📋</div>
+                        <div class="text-white text-xl font-semibold mb-3">Auto-SAR Generator</div>
+                        <div class="text-gray-300 opacity-80 leading-relaxed">
                             Automated Suspicious Activity Report generation with ML-powered risk assessment and compliance
                         </div>
                     </div>
@@ -396,8 +158,15 @@
                 localStorage.setItem('trinetra_authenticated', 'true');
                 localStorage.setItem('trinetra_user', username);
                 
-                // Redirect to dashboard
-                window.location.href = './dashboard.html';
+                // Show success animation
+                const button = e.target.querySelector('button');
+                const originalText = button.textContent;
+                button.textContent = 'Accessing System...';
+                button.disabled = true;
+                
+                setTimeout(() => {
+                    window.location.href = './chronos.html';
+                }, 1000);
             } else {
                 alert('Please enter both username and password');
             }
@@ -405,14 +174,7 @@
         
         // Check if user is already authenticated
         if (localStorage.getItem('trinetra_authenticated') === 'true') {
-            window.location.href = './dashboard.html';
-        }
-    </script>
-    
-    <!-- Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
+            window.location.href = './chronos.html';
         }
     </script>
 </body>

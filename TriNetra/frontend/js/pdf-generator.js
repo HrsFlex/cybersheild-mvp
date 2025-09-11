@@ -1,7 +1,5 @@
 // PDF Generation Module for TriNetra Reports
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
-import 'jspdf-autotable';
+// Uses global jsPDF, html2canvas, and jspdf-autotable loaded via CDN
 
 class TriNetraPDFGenerator {
     constructor() {
@@ -10,10 +8,36 @@ class TriNetraPDFGenerator {
         this.pageHeight = 297; // A4 height in mm
         this.margin = 20;
         this.currentY = 0;
+        
+        // Check if required libraries are loaded
+        this.checkLibraries();
+    }
+    
+    checkLibraries() {
+        if (typeof window.jspdf === 'undefined') {
+            console.error('jsPDF library not loaded. Please ensure the CDN script is included.');
+            console.log('Expected CDN: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            throw new Error('jsPDF library not available');
+        }
+        
+        if (typeof window.html2canvas === 'undefined') {
+            console.error('html2canvas library not loaded. Please ensure the CDN script is included.');
+            console.log('Expected CDN: https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+            throw new Error('html2canvas library not available');
+        }
+        
+        if (typeof window.jspdf.jsPDF === 'undefined') {
+            console.error('jsPDF constructor not found. Library may not be loaded correctly.');
+            throw new Error('jsPDF constructor not available');
+        }
+        
+        console.log('✅ PDF generation libraries loaded successfully');
+        console.log('   - jsPDF version:', window.jspdf.jsPDF.version || 'unknown');
+        console.log('   - html2canvas loaded:', typeof window.html2canvas === 'function');
     }
 
     async generateSARReport(sarData) {
-        this.doc = new jsPDF();
+        this.doc = new window.jspdf.jsPDF();
         this.currentY = this.margin;
 
         // Header
@@ -74,7 +98,7 @@ class TriNetraPDFGenerator {
     }
 
     async generateChronosReport(timelineData, networkData, scenario) {
-        this.doc = new jsPDF();
+        this.doc = new window.jspdf.jsPDF();
         this.currentY = this.margin;
 
         // Header
@@ -135,7 +159,7 @@ class TriNetraPDFGenerator {
     }
 
     async generateHydraReport(simulationData, battleHistory) {
-        this.doc = new jsPDF();
+        this.doc = new window.jspdf.jsPDF();
         this.currentY = this.margin;
 
         // Header
@@ -337,7 +361,7 @@ class TriNetraPDFGenerator {
                 this.doc.text('Network Visualization', this.margin, this.currentY);
                 this.currentY += 10;
                 
-                const canvas = await html2canvas(networkSvg, {
+                const canvas = await window.html2canvas(networkSvg, {
                     backgroundColor: '#1a1a2e',
                     scale: 1,
                     useCORS: true

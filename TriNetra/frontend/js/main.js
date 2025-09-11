@@ -1,11 +1,5 @@
 // TriNetra Main Entry Point
-// Import all CSS files for Vite processing
-import '../css/design-system.css'
-import '../css/main.css'
-import '../css/chronos.css'
-import '../css/components.css'
-import '../css/responsive.css'
-import '../css/animations.css'
+// CSS files are loaded directly in HTML for better compatibility
 
 // Import all JS modules
 import api from './api.js'

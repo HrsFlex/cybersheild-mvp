@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHRONOS - Timeline Analysis | TriNetra</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00ff87',
+                        secondary: '#00d4ff',
+                        dark: '#0a0a0f',
+                        'dark-secondary': '#1a1a2e',
+                        'dark-accent': '#16213e'
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #00ff87; }
+            to { box-shadow: 0 0 30px #00ff87, 0 0 40px #00ff87; }
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00ff87;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+        }
+        .slider::-moz-range-thumb {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00ff87;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 255, 135, 0.5);
+        }
+    </style>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="text-white">
+    <!-- Navigation -->
+    <nav class="bg-dark-secondary/80 backdrop-blur-sm border-b border-primary/20 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                        TriNetra
+                    </h1>
+                    <span class="text-gray-400">|</span>
+                    <h2 class="text-xl font-semibold text-primary">🕐 CHRONOS</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="user-welcome" class="text-gray-300"></span>
+                    <button id="logout-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="animate-float mb-6">
+                <div class="w-24 h-24 mx-auto bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-4xl animate-glow">
+                    🕐
+                </div>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                CHRONOS Timeline
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                Visualize financial crime patterns through time. Analyze transaction flows, detect suspicious activities, and uncover hidden connections in real-time.
+            </p>
+            
+            <!-- Progress Flow -->
+            <div class="flex justify-center items-center space-x-4 mb-8">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-dark font-bold">1</div>
+                    <span class="ml-2 text-primary font-semibold">CHRONOS</span>
+                </div>
+                <div class="w-8 h-px bg-gray-600"></div>
+                <div class="flex items-center opacity-50">
+                    <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-bold">2</div>
+                    <span class="ml-2 text-gray-400">Auto-SAR</span>
+                </div>
+                <div class="w-8 h-px bg-gray-600"></div>
+                <div class="flex items-center opacity-50">
+                    <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-gray-400 font-bold">3</div>
+                    <span class="ml-2 text-gray-400">HYDRA</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="bg-dark-secondary/60 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-primary/20">
+            <h3 class="text-2xl font-semibold mb-6 text-primary">Timeline Controls</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                <!-- Time Quantum -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Time Period</label>
+                    <select id="time-quantum" class="w-full bg-dark/80 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary">
+                        <option value="1m">1 Month</option>
+                        <option value="6m">6 Months</option>
+                        <option value="1y">1 Year</option>
+                        <option value="3y">3 Years</option>
+                    </select>
+                </div>
+                
+                <!-- Search -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Search Transactions</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="transaction-search" placeholder="Enter search term..." 
+                               class="flex-1 bg-dark/80 border border-gray-600 rounded-lg px-3 py-2 text-white focus:border-primary focus:ring-1 focus:ring-primary">
+                        <button id="search-button" class="px-4 py-2 bg-primary hover:bg-primary/80 text-dark font-semibold rounded-lg transition-colors">
+                            🔍
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Playback Controls -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Playback</label>
+                    <div class="flex space-x-2 mb-2">
+                        <button id="play-button" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                            ▶️ Play
+                        </button>
+                        <button id="pause-button" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors">
+                            ⏸️ Pause
+                        </button>
+                        <button id="reset-button" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                            🔄 Reset
+                        </button>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-xs text-gray-400">Speed: <span id="speed-display">1x</span></label>
+                        <input type="range" id="speed-control" min="0.25" max="4" step="0.25" value="1" 
+                               class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span>0.25x</span>
+                            <span>1x</span>
+                            <span>4x</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- View Mode -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">View Mode</label>
+                    <div class="flex space-x-2">
+                        <button id="timeline-view" class="flex-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 rounded-lg transition-colors view-button active">
+                            📈 Timeline
+                        </button>
+                        <button id="network-view" class="flex-1 px-3 py-2 bg-secondary/20 hover:bg-secondary/30 text-secondary border border-secondary/30 rounded-lg transition-colors view-button">
+                            🕸️ Network
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Export -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-300">Export</label>
+                    <button id="export-chronos" class="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+                        📄 Export PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Visualization -->
+        <div class="bg-dark-secondary/60 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-primary/20">
+            <div id="chronos-timeline" class="min-h-[600px] w-full"></div>
+            <div id="timeline-info" class="mt-6 p-6 bg-dark/40 rounded-lg"></div>
+        </div>
+
+        <!-- AI Insights Panel -->
+        <div class="bg-dark-secondary/60 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-primary/20">
+            <h3 class="text-2xl font-semibold mb-6 text-primary flex items-center">
+                🤖 AI Insights <span class="ml-3 text-sm bg-primary/20 text-primary px-3 py-1 rounded-full">Advanced Analysis</span>
+            </h3>
+            <div id="ai-insights" class="space-y-6">
+                <div class="animate-pulse">
+                    <div class="h-6 bg-gray-600 rounded w-3/4 mb-3"></div>
+                    <div class="h-6 bg-gray-600 rounded w-1/2"></div>
+                </div>
+            </div>
+            <button id="get-insights" class="mt-6 px-8 py-3 bg-gradient-to-r from-primary to-secondary text-dark font-bold rounded-xl hover:shadow-lg transition-all text-lg">
+                Generate AI Insights
+            </button>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between items-center">
+            <button onclick="window.location.href='login.html'" 
+                    class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                ← Back to Login
+            </button>
+            <button id="proceed-to-autosar" 
+                    class="px-8 py-3 bg-gradient-to-r from-primary to-secondary text-dark font-bold rounded-lg hover:shadow-lg transform hover:scale-105 transition-all">
+                Proceed to Auto-SAR →
+            </button>
+        </div>
+    </main>
+
+    <!-- Authentication Script -->
+    <script>
+        // Check authentication
+        if (localStorage.getItem('trinetra_authenticated') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        
+        // Display user
+        const user = localStorage.getItem('trinetra_user');
+        if (user) {
+            document.getElementById('user-welcome').textContent = `Welcome, ${user}`;
+        }
+        
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('trinetra_authenticated');
+            localStorage.removeItem('trinetra_user');
+            window.location.href = 'login.html';
+        });
+        
+        // Proceed to next page with progress tracking
+        document.getElementById('proceed-to-autosar').addEventListener('click', () => {
+            if (window.progressTracker) {
+                window.progressTracker.navigateToNext();
+            } else {
+                window.location.href = 'autosar.html';
+            }
+        });
+    </script>
+
+    <!-- Progress Tracker -->
+    <script type="module" src="/js/progress-tracker.js"></script>
+    
+    <!-- API Configuration -->
+    <script type="module" src="/js/init-api.js"></script>
+    
+    <!-- Main Application Script -->
+    <script type="module" src="/js/chronos-page.js"></script>
+</body>
+</html>

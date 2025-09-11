@@ -28,6 +28,7 @@ class ChronosTimeline {
         this.setupTimeline();
         this.setupControls();
         this.setupSearchModal();
+        this.setupNetworkOverview();
     }
 
     setupTimeline() {
@@ -39,71 +40,83 @@ class ChronosTimeline {
         
         // Add CHRONOS explanation
         container.append('div')
-            .attr('class', 'chronos-explanation')
+            .attr('class', 'chronos-explanation bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 border border-primary/20 mb-8 shadow-xl')
             .html(`
-                <div class="explanation-header">
-                    <h4>📊 CHRONOS: Transaction Timeline Analysis</h4>
-                    <p>Interactive time-based visualization of financial transactions and patterns.</p>
-                    <p class="start-instruction">👆 <strong>Click Play to start the timeline animation</strong></p>
+                <div class="explanation-header text-center mb-8">
+                    <h4 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">📊 CHRONOS: Transaction Timeline Analysis</h4>
+                    <p class="text-xl text-gray-300 mb-6 leading-relaxed">Interactive time-based visualization of financial transactions and patterns with advanced AI-powered detection.</p>
+                    <div class="bg-primary/20 border border-primary/40 rounded-xl p-4 inline-block">
+                        <p class="start-instruction text-lg font-bold text-primary">👆 <strong>Click Play to start the timeline animation</strong></p>
+                    </div>
                 </div>
-                <div class="explanation-content">
-                    <div class="explanation-item">
-                        <span class="emoji">🎬</span>
-                        <div>
-                            <strong>Time-Lapse Animation:</strong>
-                            <span>Watch transactions unfold chronologically over time</span>
+                <div class="explanation-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-green-400/20 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                        <div class="text-center mb-4">
+                            <span class="emoji text-4xl block mb-2">🎬</span>
+                            <strong class="text-green-400 text-lg block mb-2">Time-Lapse Animation</strong>
                         </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">Watch transactions unfold chronologically over time with smooth animations and real-time pattern detection.</p>
                     </div>
-                    <div class="explanation-item">
-                        <span class="emoji">🔴</span>
-                        <div>
-                            <strong>Risk Indicators:</strong>
-                            <span>Red = High suspicion, Yellow = Medium risk, Blue = Normal</span>
+                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-red-400/20 hover:border-red-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                        <div class="text-center mb-4">
+                            <span class="emoji text-4xl block mb-2">🔴</span>
+                            <strong class="text-red-400 text-lg block mb-2">Risk Indicators</strong>
                         </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">
+                            <span class="text-red-400 font-semibold">Red</span> = High suspicion, 
+                            <span class="text-yellow-400 font-semibold">Yellow</span> = Medium risk, 
+                            <span class="text-blue-400 font-semibold">Blue</span> = Normal transactions
+                        </p>
                     </div>
-                    <div class="explanation-item">
-                        <span class="emoji">⚡</span>
-                        <div>
-                            <strong>Speed Control:</strong>
-                            <span>Adjust animation speed from 1x to 50x for detailed analysis</span>
+                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                        <div class="text-center mb-4">
+                            <span class="emoji text-4xl block mb-2">⚡</span>
+                            <strong class="text-yellow-400 text-lg block mb-2">Speed Control</strong>
                         </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">Adjust animation speed from 0.25x to 4x for detailed forensic analysis and pattern identification.</p>
                     </div>
-                    <div class="explanation-item">
-                        <span class="emoji">🔍</span>
-                        <div>
-                            <strong>Interactive Details:</strong>
-                            <span>Hover over transactions to see detailed information</span>
+                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-purple-400/20 hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                        <div class="text-center mb-4">
+                            <span class="emoji text-4xl block mb-2">🔍</span>
+                            <strong class="text-purple-400 text-lg block mb-2">Interactive Details</strong>
                         </div>
+                        <p class="text-gray-300 text-sm leading-relaxed">Hover over transactions to see detailed information, risk scores, and ML-powered insights.</p>
                     </div>
                 </div>
             `);
         
         // Add status bar
         container.append('div')
-            .attr('class', 'status-bar')
+            .attr('class', 'status-bar bg-gradient-to-r from-dark-secondary/80 to-dark-accent/80 rounded-2xl p-6 mb-8 border border-primary/30 shadow-lg')
             .html(`
-                <div class="status-item">
-                    <span class="status-label">Total Transactions:</span>
-                    <span class="status-value" id="total-count">0</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Suspicious:</span>
-                    <span class="status-value" id="suspicious-count">0</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Risk Level:</span>
-                    <span class="status-value" id="risk-level">LOW</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="status-item bg-dark/40 rounded-xl p-4 text-center border border-secondary/20">
+                        <div class="text-secondary font-bold text-2xl mb-1" id="total-count">0</div>
+                        <div class="text-gray-300 text-sm">Total Transactions</div>
+                    </div>
+                    <div class="status-item bg-dark/40 rounded-xl p-4 text-center border border-red-400/20">
+                        <div class="text-red-400 font-bold text-2xl mb-1" id="suspicious-count">0</div>
+                        <div class="text-gray-300 text-sm">Suspicious Patterns</div>
+                    </div>
+                    <div class="status-item bg-dark/40 rounded-xl p-4 text-center border border-orange-400/20">
+                        <div class="font-bold text-2xl mb-1" id="risk-level">LOW</div>
+                        <div class="text-gray-300 text-sm">Risk Assessment</div>
+                    </div>
                 </div>
             `);
         
-        // Create clean SVG
-        this.width = Math.max(this.container.clientWidth - this.margin.left - this.margin.right, 600);
+        // Create clean SVG with improved styling
+        this.width = Math.max(this.container.clientWidth - this.margin.left - this.margin.right, 800);
         
         this.svg = container
             .append('svg')
-            .attr('class', 'timeline-svg')
+            .attr('class', 'timeline-svg bg-dark/20 rounded-xl border border-primary/20')
             .attr('width', this.width + this.margin.left + this.margin.right)
-            .attr('height', this.height + this.margin.top + this.margin.bottom);
+            .attr('height', this.height + this.margin.top + this.margin.bottom)
+            .style('background', 'linear-gradient(135deg, rgba(10, 10, 15, 0.95) 0%, rgba(26, 26, 46, 0.85) 50%, rgba(22, 33, 62, 0.75) 100%)')
+            .style('backdrop-filter', 'blur(12px)')
+            .style('border', '2px solid rgba(0, 255, 135, 0.3)')
+            .style('box-shadow', '0 8px 32px rgba(0, 255, 135, 0.1)');
 
         this.g = this.svg.append('g')
             .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
@@ -112,80 +125,143 @@ class ChronosTimeline {
         this.xScale = d3.scaleTime().range([0, this.width]);
         this.yScale = d3.scaleLinear().range([this.height - this.margin.bottom, this.margin.top]);
 
-        // Create axes
-        this.xAxis = d3.axisBottom(this.xScale).tickFormat(d3.timeFormat('%m/%d %H:%M'));
-        this.yAxis = d3.axisLeft(this.yScale).tickFormat(d => formatCurrency(d));
+        // Create axes with enhanced styling
+        this.xAxis = d3.axisBottom(this.xScale)
+            .tickFormat(d3.timeFormat('%m/%d\n%H:%M'))
+            .ticks(12)
+            .tickSize(-this.height + this.margin.top + this.margin.bottom)
+            .tickPadding(15);
+            
+        this.yAxis = d3.axisLeft(this.yScale)
+            .tickFormat(d => {
+                if (d >= 1000000) return `₹${(d/1000000).toFixed(1)}M`;
+                if (d >= 100000) return `₹${(d/1000).toFixed(0)}K`;
+                if (d >= 1000) return `₹${(d/1000).toFixed(1)}K`;
+                return `₹${d.toFixed(0)}`;
+            })
+            .ticks(10)
+            .tickSize(-this.width)
+            .tickPadding(15);
 
+        // Add grid lines and axes
         this.g.append('g')
             .attr('class', 'x-axis timeline-axis')
-            .attr('transform', `translate(0,${this.height - this.margin.bottom})`);
+            .attr('transform', `translate(0,${this.height - this.margin.bottom})`)
+            .style('color', '#4a5568')
+            .style('font-size', '12px');
 
         this.g.append('g')
-            .attr('class', 'y-axis timeline-axis');
+            .attr('class', 'y-axis timeline-axis')
+            .style('color', '#4a5568')
+            .style('font-size', '12px');
 
-        // Add axis labels
+        // Add enhanced axis labels
         this.g.append('text')
             .attr('class', 'axis-label')
             .attr('transform', 'rotate(-90)')
-            .attr('y', 0 - this.margin.left)
+            .attr('y', 0 - this.margin.left + 15)
             .attr('x', 0 - (this.height / 2))
             .attr('dy', '1em')
             .style('text-anchor', 'middle')
-            .style('fill', 'var(--text-light)')
-            .text('Transaction Amount (₹)');
-
-        this.g.append('text')
-            .attr('class', 'axis-label')
-            .attr('transform', `translate(${this.width / 2}, ${this.height + 35})`)
-            .style('text-anchor', 'middle')
-            .style('fill', 'var(--text-light)')
-            .text('Time');
-
-        // Create tooltip
-        this.tooltip = d3.select('body').append('div')
-            .attr('class', 'tooltip')
-            .style('opacity', 0);
+            .style('fill', '#00ff87')
+            .style('font-size', '14px')
+            .style('font-weight', '600')
+            .text('💰 Transaction Amount (₹)');
 
         this.g.append('text')
             .attr('class', 'axis-label')
             .attr('transform', `translate(${this.width / 2}, ${this.height + this.margin.bottom - 5})`)
             .style('text-anchor', 'middle')
-            .style('fill', 'var(--text-gray)')
-            .text('Timeline');
+            .style('fill', '#00d4ff')
+            .style('font-size', '14px')
+            .style('font-weight', '600')
+            .text('⏰ Timeline (Date & Time)');
+            
+        // Add enhanced CSS for grid lines and better readability
+        this.svg.append('defs').append('style').text(`
+            .timeline-axis .tick line {
+                stroke: rgba(255, 255, 255, 0.6);
+                stroke-width: 1px;
+                opacity: 1;
+            }
+            .timeline-axis .domain {
+                stroke: #ffffff;
+                stroke-width: 3px;
+                opacity: 1;
+            }
+            .timeline-axis text {
+                fill: #ffffff;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            }
+            .timeline-axis .tick:hover line {
+                stroke: rgba(255, 255, 255, 0.8);
+                stroke-width: 2px;
+            }
+        `);
 
-        // Create tooltip
+        // Create enhanced tooltip
         this.tooltip = d3.select('body').append('div')
-            .attr('class', 'timeline-tooltip')
+            .attr('class', 'chronos-tooltip')
             .style('position', 'absolute')
-            .style('background', 'var(--bg-card)')
-            .style('border', '1px solid var(--accent-green)')
-            .style('border-radius', '6px')
-            .style('padding', '10px')
-            .style('color', 'var(--text-light)')
-            .style('font-size', '12px')
-            .style('z-index', '1000')
-            .style('opacity', 0);
+            .style('background', 'linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(22, 33, 62, 0.95) 100%)')
+            .style('backdrop-filter', 'blur(12px)')
+            .style('border', '1px solid #00ff87')
+            .style('border-radius', '12px')
+            .style('padding', '16px')
+            .style('color', '#ffffff')
+            .style('font-size', '13px')
+            .style('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif')
+            .style('box-shadow', '0 8px 32px rgba(0, 255, 135, 0.15)')
+            .style('z-index', '10000')
+            .style('opacity', 0)
+            .style('pointer-events', 'none')
+            .style('transition', 'all 0.2s ease-in-out');
 
         // Add info panel
         container.append('div')
-            .attr('class', 'timeline-info')
+            .attr('class', 'timeline-info bg-gradient-to-br from-secondary/10 to-primary/10 rounded-2xl p-8 mb-8 border border-secondary/20 shadow-lg')
             .html(`
-                <h4>📊 Transaction Analysis</h4>
-                <p>Hover over any transaction point to see detailed information</p>
+                <div class="text-center mb-6">
+                    <h4 class="text-2xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent mb-4">📊 Transaction Analysis Dashboard</h4>
+                    <p class="text-lg text-gray-300 leading-relaxed">Comprehensive real-time analysis of financial transaction patterns and risk assessment.</p>
+                </div>
             `);
             
         // Add keyboard shortcuts
         container.append('div')
-            .attr('class', 'shortcuts-info')
+            .attr('class', 'shortcuts-info bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-2xl p-8 border border-purple-400/20 shadow-lg')
             .html(`
-                <h6>⌨️ Keyboard Controls</h6>
-                <ul>
-                    <li><kbd>Space</kbd> <span>Play/Pause</span></li>
-                    <li><kbd>R</kbd> <span>Reset</span></li>
-                    <li><kbd>T</kbd> <span>Timeline View</span></li>
-                    <li><kbd>N</kbd> <span>Network View</span></li>
-                    <li><kbd>Ctrl+F</kbd> <span>Search</span></li>
-                </ul>
+                <div class="text-center mb-6">
+                    <h6 class="text-2xl font-bold text-purple-400 mb-4 flex items-center justify-center">
+                        ⌨️ Keyboard Controls
+                        <span class="ml-3 text-sm bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full">Pro Tips</span>
+                    </h6>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-green-400/20 hover:border-green-400/50 transition-all">
+                        <kbd class="bg-green-500/20 text-green-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">Space</kbd>
+                        <span class="text-gray-300 text-sm">Play/Pause</span>
+                    </div>
+                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-red-400/20 hover:border-red-400/50 transition-all">
+                        <kbd class="bg-red-500/20 text-red-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">R</kbd>
+                        <span class="text-gray-300 text-sm">Reset</span>
+                    </div>
+                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-blue-400/20 hover:border-blue-400/50 transition-all">
+                        <kbd class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">T</kbd>
+                        <span class="text-gray-300 text-sm">Timeline View</span>
+                    </div>
+                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-yellow-400/20 hover:border-yellow-400/50 transition-all">
+                        <kbd class="bg-yellow-500/20 text-yellow-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">N</kbd>
+                        <span class="text-gray-300 text-sm">Network View</span>
+                    </div>
+                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-purple-400/20 hover:border-purple-400/50 transition-all">
+                        <kbd class="bg-purple-500/20 text-purple-400 px-2 py-2 rounded-lg font-bold text-sm block mb-2">Ctrl+F</kbd>
+                        <span class="text-gray-300 text-sm">Search</span>
+                    </div>
+                </div>
             `);
     }
 
@@ -221,6 +297,134 @@ class ChronosTimeline {
         // Add event listener to close modal
         this.searchModal.select('.close-search-modal')
             .on('click', () => this.hideSearchModal());
+    }
+
+    setupNetworkOverview() {
+        // Create network overview modal
+        this.networkOverviewModal = d3.select('body').append('div')
+            .attr('class', 'network-overview-modal hidden')
+            .style('position', 'fixed')
+            .style('top', '5%')
+            .style('left', '5%')
+            .style('width', '90%')
+            .style('height', '90%')
+            .style('background', 'linear-gradient(135deg, rgba(10, 10, 15, 0.98) 0%, rgba(26, 26, 46, 0.95) 50%, rgba(22, 33, 62, 0.98) 100%)')
+            .style('backdrop-filter', 'blur(20px)')
+            .style('border', '2px solid #00ff87')
+            .style('border-radius', '20px')
+            .style('z-index', '10001')
+            .style('box-shadow', '0 20px 60px rgba(0, 255, 135, 0.3)')
+            .style('overflow', 'hidden');
+
+        // Add modal header
+        const header = this.networkOverviewModal.append('div')
+            .attr('class', 'network-overview-header')
+            .style('padding', '20px 30px')
+            .style('border-bottom', '2px solid rgba(0, 255, 135, 0.3)')
+            .style('background', 'rgba(0, 255, 135, 0.1)')
+            .style('display', 'flex')
+            .style('justify-content', 'space-between')
+            .style('align-items', 'center');
+
+        header.append('div')
+            .html(`
+                <h2 style="color: #00ff87; font-size: 28px; font-weight: bold; margin: 0; display: flex; align-items: center;">
+                    🕸️ Complete Network Overview
+                    <span style="margin-left: 15px; font-size: 14px; background: rgba(0, 255, 135, 0.2); color: #00ff87; padding: 5px 12px; border-radius: 20px;">Full Analysis</span>
+                </h2>
+                <p style="color: #a0aec0; font-size: 16px; margin: 5px 0 0 0;">Interactive visualization of all account connections and transaction flows</p>
+            `);
+
+        const controls = header.append('div')
+            .style('display', 'flex')
+            .style('gap', '15px')
+            .style('align-items', 'center');
+
+        // Add control buttons
+        controls.append('button')
+            .attr('class', 'network-zoom-fit')
+            .style('padding', '8px 16px')
+            .style('background', 'rgba(0, 212, 255, 0.2)')
+            .style('border', '1px solid #00d4ff')
+            .style('border-radius', '8px')
+            .style('color', '#00d4ff')
+            .style('cursor', 'pointer')
+            .style('font-weight', '600')
+            .style('transition', 'all 0.3s ease')
+            .text('🔍 Zoom to Fit')
+            .on('click', () => this.zoomToFitNetwork())
+            .on('mouseover', function() {
+                d3.select(this).style('background', 'rgba(0, 212, 255, 0.3)');
+            })
+            .on('mouseout', function() {
+                d3.select(this).style('background', 'rgba(0, 212, 255, 0.2)');
+            });
+
+        controls.append('button')
+            .attr('class', 'network-reset')
+            .style('padding', '8px 16px')
+            .style('background', 'rgba(239, 68, 68, 0.2)')
+            .style('border', '1px solid #ef4444')
+            .style('border-radius', '8px')
+            .style('color', '#ef4444')
+            .style('cursor', 'pointer')
+            .style('font-weight', '600')
+            .style('transition', 'all 0.3s ease')
+            .text('🔄 Reset View')
+            .on('click', () => this.resetNetworkView())
+            .on('mouseover', function() {
+                d3.select(this).style('background', 'rgba(239, 68, 68, 0.3)');
+            })
+            .on('mouseout', function() {
+                d3.select(this).style('background', 'rgba(239, 68, 68, 0.2)');
+            });
+
+        controls.append('button')
+            .attr('class', 'close-network-overview')
+            .style('padding', '8px 16px')
+            .style('background', 'rgba(156, 163, 175, 0.2)')
+            .style('border', '1px solid #9ca3af')
+            .style('border-radius', '8px')
+            .style('color', '#9ca3af')
+            .style('cursor', 'pointer')
+            .style('font-weight', '600')
+            .style('transition', 'all 0.3s ease')
+            .text('✕ Close')
+            .on('click', () => this.hideNetworkOverview())
+            .on('mouseover', function() {
+                d3.select(this).style('background', 'rgba(156, 163, 175, 0.3)');
+            })
+            .on('mouseout', function() {
+                d3.select(this).style('background', 'rgba(156, 163, 175, 0.2)');
+            });
+
+        // Add main content area
+        this.networkOverviewModal.append('div')
+            .attr('class', 'network-overview-content')
+            .style('height', 'calc(100% - 100px)')
+            .style('position', 'relative');
+
+        // Add zoom and pan controls info
+        this.networkOverviewModal.select('.network-overview-content')
+            .append('div')
+            .attr('class', 'network-controls-info')
+            .style('position', 'absolute')
+            .style('top', '20px')
+            .style('right', '20px')
+            .style('background', 'rgba(0, 0, 0, 0.8)')
+            .style('border', '1px solid rgba(0, 255, 135, 0.3)')
+            .style('border-radius', '12px')
+            .style('padding', '12px 16px')
+            .style('color', '#e2e8f0')
+            .style('font-size', '12px')
+            .style('z-index', '10002')
+            .html(`
+                <div style="font-weight: bold; color: #00ff87; margin-bottom: 8px;">🎮 Network Controls</div>
+                <div style="margin-bottom: 4px;">🖱️ <strong>Drag:</strong> Pan network</div>
+                <div style="margin-bottom: 4px;">🔍 <strong>Scroll:</strong> Zoom in/out</div>
+                <div style="margin-bottom: 4px;">👆 <strong>Click Node:</strong> Focus & info</div>
+                <div>🔗 <strong>Drag Node:</strong> Reposition</div>
+            `);
     }
 
     setupControls() {
@@ -717,35 +921,59 @@ class ChronosTimeline {
         const summaryDiv = document.createElement('div');
         summaryDiv.className = 'layering-summary';
         summaryDiv.innerHTML = `
-            <h4>🔍 Layering Analysis Summary</h4>
-            <div class="summary-stats">
-                <div class="stat-item">
-                    <span class="stat-label">Total Transactions:</span>
-                    <span class="stat-value">${summary.total_transactions}</span>
+            <div class="bg-gradient-to-br from-orange-500/10 to-red-500/10 rounded-2xl p-8 border border-orange-400/30 shadow-xl mb-8">
+                <div class="text-center mb-8">
+                    <h4 class="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-4">
+                        🔍 Advanced Layering Analysis Summary
+                    </h4>
+                    <p class="text-lg text-gray-300 leading-relaxed">Multi-layer detection system performance and risk distribution analysis</p>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Critical Risk:</span>
-                    <span class="stat-value critical">${summary.risk_distribution.critical}</span>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-dark/60 rounded-xl p-6 text-center border border-secondary/20 hover:border-secondary/50 transition-all duration-300">
+                        <div class="text-3xl font-bold text-secondary mb-2">${summary.total_transactions}</div>
+                        <div class="text-sm text-gray-300 font-medium">Total Transactions</div>
+                        <div class="text-xs text-gray-400 mt-1">Analyzed</div>
+                    </div>
+                    <div class="bg-dark/60 rounded-xl p-6 text-center border border-red-400/20 hover:border-red-400/50 transition-all duration-300">
+                        <div class="text-3xl font-bold text-red-400 mb-2">${summary.risk_distribution.critical}</div>
+                        <div class="text-sm text-gray-300 font-medium">Critical Risk</div>
+                        <div class="text-xs text-red-300 mt-1">Immediate Action</div>
+                    </div>
+                    <div class="bg-dark/60 rounded-xl p-6 text-center border border-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300">
+                        <div class="text-3xl font-bold text-yellow-400 mb-2">${summary.risk_distribution.medium}</div>
+                        <div class="text-sm text-gray-300 font-medium">Medium Risk</div>
+                        <div class="text-xs text-yellow-300 mt-1">Monitor Closely</div>
+                    </div>
+                    <div class="bg-dark/60 rounded-xl p-6 text-center border border-green-400/20 hover:border-green-400/50 transition-all duration-300">
+                        <div class="text-3xl font-bold text-green-400 mb-2">${summary.risk_distribution.low}</div>
+                        <div class="text-sm text-gray-300 font-medium">Low Risk</div>
+                        <div class="text-xs text-green-300 mt-1">Normal Activity</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Medium Risk:</span>
-                    <span class="stat-value suspicious">${summary.risk_distribution.medium}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Low Risk:</span>
-                    <span class="stat-value normal">${summary.risk_distribution.low}</span>
-                </div>
-            </div>
-            <div class="effectiveness-metrics">
-                <h5>Detection Effectiveness:</h5>
-                <div class="metric-item">
-                    Layer 1: ${(summary.layering_effectiveness.layer_1_detection_rate * 100).toFixed(1)}%
-                </div>
-                <div class="metric-item">
-                    Layer 2: ${(summary.layering_effectiveness.layer_2_processing_rate * 100).toFixed(1)}%
-                </div>
-                <div class="metric-item">
-                    Layer 3: ${(summary.layering_effectiveness.layer_3_integration_rate * 100).toFixed(1)}%
+                
+                <div class="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-6 border border-purple-400/30">
+                    <h5 class="text-2xl font-bold text-purple-400 mb-6 text-center flex items-center justify-center">
+                        ⚡ Detection Effectiveness Matrix
+                        <span class="ml-3 text-sm bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full">AI Powered</span>
+                    </h5>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-dark/40 rounded-xl p-6 text-center border border-primary/20">
+                            <div class="text-2xl font-bold text-primary mb-2">${(summary.layering_effectiveness.layer_1_detection_rate * 100).toFixed(1)}%</div>
+                            <div class="text-gray-300 font-medium">Layer 1: Extraction</div>
+                            <div class="text-xs text-gray-400 mt-2">Data Pattern Recognition</div>
+                        </div>
+                        <div class="bg-dark/40 rounded-xl p-6 text-center border border-secondary/20">
+                            <div class="text-2xl font-bold text-secondary mb-2">${(summary.layering_effectiveness.layer_2_processing_rate * 100).toFixed(1)}%</div>
+                            <div class="text-gray-300 font-medium">Layer 2: Processing</div>
+                            <div class="text-xs text-gray-400 mt-2">Behavioral Analysis</div>
+                        </div>
+                        <div class="bg-dark/40 rounded-xl p-6 text-center border border-orange-400/20">
+                            <div class="text-2xl font-bold text-orange-400 mb-2">${(summary.layering_effectiveness.layer_3_integration_rate * 100).toFixed(1)}%</div>
+                            <div class="text-gray-300 font-medium">Layer 3: Integration</div>
+                            <div class="text-xs text-gray-400 mt-2">Risk Assessment</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -763,6 +991,358 @@ class ChronosTimeline {
         if (this.searchModal) {
             this.searchModal.classed('hidden', true);
         }
+    }
+
+    showNetworkOverview() {
+        if (!this.networkOverviewModal || !this.data || this.data.length === 0) {
+            showNotification('No network data available to display', 'warning');
+            return;
+        }
+
+        console.log('🕸️ CHRONOS: Opening network overview modal');
+        
+        // Show the modal
+        this.networkOverviewModal.classed('hidden', false);
+        
+        // Clear existing network overview content
+        const content = this.networkOverviewModal.select('.network-overview-content');
+        content.selectAll('svg').remove();
+        
+        // Create full-size SVG for overview
+        const modalWidth = window.innerWidth * 0.9;
+        const modalHeight = window.innerHeight * 0.9 - 100; // Account for header
+        
+        const overviewSvg = content
+            .append('svg')
+            .attr('class', 'network-overview-svg')
+            .attr('width', modalWidth)
+            .attr('height', modalHeight)
+            .style('background', 'linear-gradient(135deg, rgba(10, 10, 15, 0.8) 0%, rgba(26, 26, 46, 0.6) 50%, rgba(22, 33, 62, 0.4) 100%)')
+            .style('border-radius', '12px')
+            .style('border', '1px solid rgba(0, 255, 135, 0.2)');
+
+        // Add zoom and pan behavior
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on('zoom', (event) => {
+                overviewGroup.attr('transform', event.transform);
+            });
+
+        overviewSvg.call(zoom);
+
+        const overviewGroup = overviewSvg.append('g')
+            .attr('class', 'network-overview-group');
+
+        // Create network data if not exists
+        if (!this.networkNodes || this.networkNodes.length === 0) {
+            this.createNetworkData();
+        }
+
+        // Create a more spread out force simulation for overview
+        this.overviewSimulation = d3.forceSimulation(this.networkNodes)
+            .force('link', d3.forceLink(this.networkLinks).id(d => d.id).distance(150))
+            .force('charge', d3.forceManyBody().strength(-800))
+            .force('center', d3.forceCenter(modalWidth / 2, modalHeight / 2))
+            .force('collision', d3.forceCollide().radius(40))
+            .force('x', d3.forceX(modalWidth / 2).strength(0.1))
+            .force('y', d3.forceY(modalHeight / 2).strength(0.1));
+
+        // Create links for overview
+        const overviewLinks = overviewGroup.append('g')
+            .attr('class', 'overview-links')
+            .selectAll('line')
+            .data(this.networkLinks)
+            .enter().append('line')
+            .attr('class', 'overview-link')
+            .style('stroke', d => d.suspicious ? '#ef4444' : '#00ff87')
+            .style('stroke-width', d => d.suspicious ? 6 : 3)
+            .style('opacity', d => d.suspicious ? 0.9 : 0.6)
+            .style('filter', d => d.suspicious ? 'drop-shadow(0 0 4px #ef4444)' : 'drop-shadow(0 0 2px #00ff87)');
+
+        // Create nodes for overview
+        const overviewNodes = overviewGroup.append('g')
+            .attr('class', 'overview-nodes')
+            .selectAll('circle')
+            .data(this.networkNodes)
+            .enter().append('circle')
+            .attr('class', 'overview-node')
+            .attr('r', d => d.type === 'account' ? (d.suspicious ? 25 : 20) : 15)
+            .style('fill', d => {
+                if (d.type === 'account') {
+                    return d.suspicious ? '#ef4444' : '#00d4ff';
+                }
+                return '#00ff87';
+            })
+            .style('stroke', '#ffffff')
+            .style('stroke-width', 4)
+            .style('filter', d => {
+                if (d.type === 'account') {
+                    return d.suspicious ? 'drop-shadow(0 0 12px #ef4444)' : 'drop-shadow(0 0 10px #00d4ff)';
+                }
+                return 'drop-shadow(0 0 8px #00ff87)';
+            })
+            .style('cursor', 'pointer')
+            .call(d3.drag()
+                .on('start', (event, d) => {
+                    if (!event.active) this.overviewSimulation.alphaTarget(0.3).restart();
+                    d.fx = d.x;
+                    d.fy = d.y;
+                })
+                .on('drag', (event, d) => {
+                    d.fx = event.x;
+                    d.fy = event.y;
+                })
+                .on('end', (event, d) => {
+                    if (!event.active) this.overviewSimulation.alphaTarget(0);
+                    d.fx = null;
+                    d.fy = null;
+                }))
+            .on('click', (event, d) => this.selectOverviewNode(d))
+            .on('mouseover', (event, d) => this.showOverviewTooltip(event, d))
+            .on('mouseout', () => this.hideTooltip());
+
+        // Create labels for overview
+        const overviewLabels = overviewGroup.append('g')
+            .attr('class', 'overview-labels')
+            .selectAll('text')
+            .data(this.networkNodes)
+            .enter().append('text')
+            .attr('class', 'overview-label')
+            .style('font-size', '14px')
+            .style('font-weight', '700')
+            .style('fill', '#e2e8f0')
+            .style('text-anchor', 'middle')
+            .style('pointer-events', 'none')
+            .style('text-shadow', '2px 2px 4px rgba(0, 0, 0, 0.8)')
+            .style('filter', 'drop-shadow(0 0 3px rgba(255, 255, 255, 0.3))')
+            .text(d => d.label);
+
+        // Update positions on simulation tick
+        this.overviewSimulation.on('tick', () => {
+            overviewLinks
+                .attr('x1', d => d.source.x)
+                .attr('y1', d => d.source.y)
+                .attr('x2', d => d.target.x)
+                .attr('y2', d => d.target.y);
+
+            overviewNodes
+                .attr('cx', d => d.x)
+                .attr('cy', d => d.y);
+
+            overviewLabels
+                .attr('x', d => d.x)
+                .attr('y', d => d.y + 6);
+        });
+
+        // Store references for control functions
+        this.overviewZoom = zoom;
+        this.overviewSvg = overviewSvg;
+        this.overviewGroup = overviewGroup;
+        
+        showNotification('Network overview opened - Double-click nodes for details', 'info');
+    }
+
+    hideNetworkOverview() {
+        if (this.networkOverviewModal) {
+            this.networkOverviewModal.classed('hidden', true);
+            
+            // Stop simulation to improve performance
+            if (this.overviewSimulation) {
+                this.overviewSimulation.stop();
+                this.overviewSimulation = null;
+            }
+            
+            console.log('🕸️ CHRONOS: Closed network overview modal');
+        }
+    }
+
+    selectOverviewNode(node) {
+        console.log('🔍 Selected overview node:', node.id);
+        
+        // Highlight connected nodes and links
+        this.overviewGroup.selectAll('.overview-node')
+            .style('opacity', d => d === node || this.isConnected(d, node) ? 1 : 0.3)
+            .style('stroke-width', d => d === node ? 6 : 4);
+            
+        this.overviewGroup.selectAll('.overview-link')
+            .style('opacity', d => {
+                const sourceId = typeof d.source === 'object' ? d.source.id : d.source;
+                const targetId = typeof d.target === 'object' ? d.target.id : d.target;
+                return (sourceId === node.id || targetId === node.id) ? 1 : 0.2;
+            });
+
+        // Show detailed info in a side panel
+        this.showOverviewNodeDetails(node);
+    }
+
+    showOverviewNodeDetails(node) {
+        // Remove existing details panel
+        this.networkOverviewModal.selectAll('.node-details-panel').remove();
+        
+        const detailsPanel = this.networkOverviewModal.select('.network-overview-content')
+            .append('div')
+            .attr('class', 'node-details-panel')
+            .style('position', 'absolute')
+            .style('top', '20px')
+            .style('left', '20px')
+            .style('width', '300px')
+            .style('background', 'rgba(0, 0, 0, 0.9)')
+            .style('border', '2px solid #00ff87')
+            .style('border-radius', '12px')
+            .style('padding', '20px')
+            .style('color', '#e2e8f0')
+            .style('z-index', '10002')
+            .style('box-shadow', '0 8px 32px rgba(0, 255, 135, 0.3)');
+
+        const connectedAccounts = this.getConnectedAccounts(node);
+        const suspiciousTransactions = node.transactions ? node.transactions.filter(tx => tx.suspicious_score > 0.5).length : 0;
+
+        detailsPanel.html(`
+            <div style="border-bottom: 2px solid #00ff87; padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #00ff87; font-size: 18px; margin: 0 0 8px 0; font-weight: bold;">🔍 Node Analysis</h3>
+                <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 20px; right: 20px; background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer;">✕</button>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <div style="color: #a0aec0; font-size: 12px; margin-bottom: 4px;">Account ID</div>
+                <div style="color: #00d4ff; font-weight: 600; font-family: monospace; font-size: 14px; word-break: break-all;">${node.id}</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <div style="color: #a0aec0; font-size: 12px; margin-bottom: 4px;">Node Type</div>
+                    <div style="color: #e2e8f0; font-weight: 600;">${node.type || 'Account'}</div>
+                </div>
+                <div>
+                    <div style="color: #a0aec0; font-size: 12px; margin-bottom: 4px;">Risk Level</div>
+                    <div style="color: ${node.suspicious ? '#ef4444' : '#10b981'}; font-weight: 700;">${node.suspicious ? 'HIGH' : 'NORMAL'}</div>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div>
+                    <div style="color: #a0aec0; font-size: 12px; margin-bottom: 4px;">Total Transactions</div>
+                    <div style="color: #00d4ff; font-weight: 600; font-size: 18px;">${node.transactions ? node.transactions.length : 0}</div>
+                </div>
+                <div>
+                    <div style="color: #a0aec0; font-size: 12px; margin-bottom: 4px;">Suspicious</div>
+                    <div style="color: ${suspiciousTransactions > 0 ? '#ef4444' : '#10b981'}; font-weight: 600; font-size: 18px;">${suspiciousTransactions}</div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <div style="color: #a0aec0; font-size: 12px; margin-bottom: 8px;">Connected Accounts (${connectedAccounts.length})</div>
+                <div style="max-height: 120px; overflow-y: auto; background: rgba(255, 255, 255, 0.05); border-radius: 8px; padding: 8px;">
+                    ${connectedAccounts.slice(0, 10).map(acc => `
+                        <div style="margin-bottom: 4px; font-size: 11px; color: #a0aec0; font-family: monospace;">
+                            ${acc.id.substring(0, 16)}...
+                        </div>
+                    `).join('')}
+                    ${connectedAccounts.length > 10 ? `<div style="font-size: 11px; color: #6b7280;">+ ${connectedAccounts.length - 10} more...</div>` : ''}
+                </div>
+            </div>
+            
+            <button onclick="window.TriNetra.getChronos().focusOnNode('${node.id}')" 
+                    style="width: 100%; padding: 10px; background: rgba(0, 255, 135, 0.2); border: 1px solid #00ff87; border-radius: 8px; color: #00ff87; cursor: pointer; font-weight: 600;">
+                🎯 Focus on This Node
+            </button>
+        `);
+    }
+
+    showOverviewTooltip(event, d) {
+        const content = `
+            <div style="font-weight: bold; color: #00ff87; margin-bottom: 8px;">🏦 ${d.type === 'account' ? 'Account' : 'Node'}</div>
+            <div style="margin-bottom: 4px;"><strong>ID:</strong> ${d.id.substring(0, 12)}...</div>
+            <div style="margin-bottom: 4px;"><strong>Transactions:</strong> ${d.transactions ? d.transactions.length : 0}</div>
+            <div style="margin-bottom: 4px;"><strong>Risk Level:</strong> <span style="color: ${d.suspicious ? '#ef4444' : '#10b981'}">${d.suspicious ? 'HIGH' : 'NORMAL'}</span></div>
+            <div style="margin-bottom: 4px;"><strong>Connections:</strong> ${this.getConnectedAccounts(d).length}</div>
+            <div style="font-size: 11px; color: #a0aec0; margin-top: 8px;">💡 Click to select, Double-click for details</div>
+        `;
+            
+        this.tooltip
+            .style('opacity', 1)
+            .html(content)
+            .style('left', (event.pageX + 15) + 'px')
+            .style('top', (event.pageY - 10) + 'px');
+    }
+
+    zoomToFitNetwork() {
+        if (!this.overviewSvg || !this.overviewZoom) return;
+        
+        // Calculate bounds of all nodes
+        const nodes = this.networkNodes;
+        if (!nodes || nodes.length === 0) return;
+        
+        const bounds = {
+            minX: d3.min(nodes, d => d.x),
+            maxX: d3.max(nodes, d => d.x),
+            minY: d3.min(nodes, d => d.y),
+            maxY: d3.max(nodes, d => d.y)
+        };
+        
+        const width = this.overviewSvg.attr('width');
+        const height = this.overviewSvg.attr('height');
+        const padding = 100;
+        
+        const scale = Math.min(
+            (width - padding) / (bounds.maxX - bounds.minX),
+            (height - padding) / (bounds.maxY - bounds.minY)
+        ) * 0.8;
+        
+        const centerX = (bounds.minX + bounds.maxX) / 2;
+        const centerY = (bounds.minY + bounds.maxY) / 2;
+        
+        const transform = d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(scale)
+            .translate(-centerX, -centerY);
+        
+        this.overviewSvg.transition()
+            .duration(750)
+            .call(this.overviewZoom.transform, transform);
+            
+        showNotification('Network zoomed to fit view', 'info');
+    }
+
+    resetNetworkView() {
+        if (!this.overviewSvg || !this.overviewZoom) return;
+        
+        this.overviewSvg.transition()
+            .duration(500)
+            .call(this.overviewZoom.transform, d3.zoomIdentity);
+            
+        // Reset node highlighting
+        if (this.overviewGroup) {
+            this.overviewGroup.selectAll('.overview-node')
+                .style('opacity', 1)
+                .style('stroke-width', 4);
+            this.overviewGroup.selectAll('.overview-link')
+                .style('opacity', d => d.suspicious ? 0.9 : 0.6);
+        }
+        
+        // Remove details panel
+        this.networkOverviewModal.selectAll('.node-details-panel').remove();
+        
+        showNotification('Network view reset', 'info');
+    }
+
+    focusOnNode(nodeId) {
+        const node = this.networkNodes.find(n => n.id === nodeId);
+        if (!node || !this.overviewSvg || !this.overviewZoom) return;
+        
+        const width = this.overviewSvg.attr('width');
+        const height = this.overviewSvg.attr('height');
+        
+        const transform = d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(2)
+            .translate(-node.x, -node.y);
+        
+        this.overviewSvg.transition()
+            .duration(750)
+            .call(this.overviewZoom.transform, transform);
+            
+        showNotification(`Focused on account ${nodeId.substring(0, 12)}...`, 'info');
     }
 
     updateStatusBar() {
@@ -882,30 +1462,104 @@ class ChronosTimeline {
         // Remove old nodes
         nodes.exit().remove();
 
-        // Add new nodes
+        // Add new nodes with enhanced styling and better visibility
         const nodeEnter = nodes.enter()
             .append('circle')
             .attr('class', d => `transaction-node ${d.suspicionLevel}`)
             .attr('r', 0)
             .attr('cx', d => this.xScale(d.timestamp))
             .attr('cy', d => this.yScale(d.amount))
-            .style('fill', d => d.color)
-            .style('opacity', 0);
+            .style('fill', d => {
+                if (d.suspicious_score > 0.8) return '#ff1744';      // Bright red for critical
+                if (d.suspicious_score > 0.5) return '#ff9800';      // Bright orange for suspicious  
+                return '#00e5ff';                                     // Bright cyan for normal
+            })
+            .style('stroke', d => {
+                if (d.suspicious_score > 0.8) return '#ffffff';      // White border for critical
+                if (d.suspicious_score > 0.5) return '#000000';      // Black border for suspicious
+                return '#ffffff';                                     // White border for normal
+            })
+            .style('stroke-width', d => {
+                if (d.suspicious_score > 0.8) return '4px';          // Thicker border for critical
+                if (d.suspicious_score > 0.5) return '3px';          // Medium border for suspicious
+                return '2px';                                         // Normal border
+            })
+            .style('opacity', 0)
+            .style('cursor', 'pointer')
+            .style('filter', d => {
+                if (d.suspicious_score > 0.8) return 'drop-shadow(0 0 12px #ff1744) drop-shadow(0 0 20px rgba(255, 23, 68, 0.6))';
+                if (d.suspicious_score > 0.5) return 'drop-shadow(0 0 10px #ff9800) drop-shadow(0 0 16px rgba(255, 152, 0, 0.4))';
+                return 'drop-shadow(0 0 8px #00e5ff) drop-shadow(0 0 12px rgba(0, 229, 255, 0.3))';
+            });
 
-        // Update existing nodes
+        // Update existing nodes with enhanced animations and better visibility
         nodes.merge(nodeEnter)
             .transition()
             .duration(500)
             .attr('cx', d => this.xScale(d.timestamp))
             .attr('cy', d => this.yScale(d.amount))
-            .attr('r', d => d.suspicionLevel === 'critical' ? 8 : d.suspicionLevel === 'suspicious' ? 6 : 4)
-            .style('fill', d => d.color)
-            .style('opacity', 0.8);
+            .attr('r', d => {
+                // Smaller, cleaner dots for better readability
+                if (d.suspicious_score > 0.8) return 6;     // Small for critical
+                if (d.suspicious_score > 0.5) return 5;     // Smaller for suspicious
+                return 4;                                    // Smallest for normal
+            })
+            .style('fill', d => {
+                if (d.suspicious_score > 0.8) return '#ff1744';
+                if (d.suspicious_score > 0.5) return '#ff9800';
+                return '#00e5ff';
+            })
+            .style('opacity', 0.9)
+            .style('stroke-width', d => {
+                if (d.suspicious_score > 0.8) return '2px';
+                if (d.suspicious_score > 0.5) return '1.5px';
+                return '1px';
+            });
 
-        // Add hover effects
+        // Add enhanced hover effects
         this.g.selectAll('.transaction-node')
-            .on('mouseover', (event, d) => this.showTooltip(event, d))
-            .on('mouseout', () => this.hideTooltip())
+            .on('mouseover', (event, d) => {
+                d3.select(event.currentTarget)
+                    .transition()
+                    .duration(200)
+                    .attr('r', d => {
+                        // Slightly larger on hover but still small
+                        if (d.suspicious_score > 0.8) return 8;     // Small hover for critical
+                        if (d.suspicious_score > 0.5) return 7;     // Smaller hover for suspicious
+                        return 6;                                    // Smallest hover for normal
+                    })
+                    .style('stroke-width', '3px')
+                    .style('opacity', 1)
+                    .style('filter', d => {
+                        if (d.suspicious_score > 0.8) return 'drop-shadow(0 0 25px #ff1744) drop-shadow(0 0 35px rgba(255, 23, 68, 0.8))';
+                        if (d.suspicious_score > 0.5) return 'drop-shadow(0 0 20px #ff9800) drop-shadow(0 0 30px rgba(255, 152, 0, 0.6))';
+                        return 'drop-shadow(0 0 18px #00e5ff) drop-shadow(0 0 25px rgba(0, 229, 255, 0.5))';
+                    });
+                this.showTooltip(event, d);
+            })
+            .on('mouseout', (event, d) => {
+                d3.select(event.currentTarget)
+                    .transition()
+                    .duration(200)
+                    .attr('r', d => {
+                        // Return to small default sizes
+                        if (d.suspicious_score > 0.8) return 6;
+                        if (d.suspicious_score > 0.5) return 5;
+                        return 4;
+                    })
+                    .style('stroke-width', d => {
+                        if (d.suspicious_score > 0.8) return '2px';
+                        if (d.suspicious_score > 0.5) return '1.5px';
+                        return '1px';
+                    })
+                    .style('opacity', 0.9)
+                    .style('filter', d => {
+                        if (d.suspicious_score > 0.8) return 'drop-shadow(0 0 12px #ff1744) drop-shadow(0 0 20px rgba(255, 23, 68, 0.6))';
+                        if (d.suspicious_score > 0.5) return 'drop-shadow(0 0 10px #ff9800) drop-shadow(0 0 16px rgba(255, 152, 0, 0.4))';
+                        return 'drop-shadow(0 0 8px #00e5ff) drop-shadow(0 0 12px rgba(0, 229, 255, 0.3))';
+                    });
+                this.hideTooltip();
+            })
             .on('click', (event, d) => this.selectTransaction(d));
     }
 
@@ -953,8 +1607,11 @@ class ChronosTimeline {
             .attr('y1', d => this.yScale(d.source.amount))
             .attr('x2', d => this.xScale(d.target.timestamp))
             .attr('y2', d => this.yScale(d.target.amount))
-            .style('stroke-width', d => d.suspicious > 0.8 ? 3 : 1)
-            .style('opacity', d => d.suspicious > 0.8 ? 0.8 : 0.4);
+            .style('stroke', d => d.suspicious > 0.8 ? '#ef4444' : d.suspicious > 0.5 ? '#f59e0b' : 'rgba(0, 255, 135, 0.6)')
+            .style('stroke-width', d => d.suspicious > 0.8 ? 5 : d.suspicious > 0.5 ? 3 : 2)
+            .style('opacity', d => d.suspicious > 0.8 ? 0.9 : d.suspicious > 0.5 ? 0.7 : 0.4)
+            .style('stroke-dasharray', d => d.suspicious > 0.8 ? 'none' : '6,4')
+            .style('filter', d => d.suspicious > 0.8 ? 'drop-shadow(0 0 4px #ef4444)' : d.suspicious > 0.5 ? 'drop-shadow(0 0 3px #f59e0b)' : 'none');
     }
 
     showTooltip(event, d) {
@@ -966,35 +1623,38 @@ class ChronosTimeline {
         this.tooltip
             .style('opacity', 1)
             .html(`
-                <h6>Transaction Details</h6>
-                <div class="detail-row">
-                    <span class="detail-label">ID:</span>
-                    <span class="detail-value">${d.id || d.transaction_id}</span>
+                <div style="border-bottom: 2px solid #00ff87; padding-bottom: 8px; margin-bottom: 12px;">
+                    <div style="color: #00ff87; font-weight: 700; font-size: 14px; margin-bottom: 4px;">💰 Transaction Details</div>
+                    <div style="color: #a0aec0; font-size: 11px;">ID: ${d.id || d.transaction_id}</div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Amount:</span>
-                    <span class="detail-value">${formatCurrency(d.amount)}</span>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <div>
+                        <div style="color: #4a5568; font-size: 11px; margin-bottom: 2px;">Amount</div>
+                        <div style="color: #00d4ff; font-weight: 600; font-size: 15px;">${formatCurrency(d.amount)}</div>
+                    </div>
+                    <div>
+                        <div style="color: #4a5568; font-size: 11px; margin-bottom: 2px;">Risk Level</div>
+                        <div style="color: ${riskClass === 'critical' ? '#ef4444' : riskClass === 'suspicious' ? '#f59e0b' : '#10b981'}; font-weight: 700; font-size: 15px;">${suspicionScore}%</div>
+                    </div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">Time:</span>
-                    <span class="detail-value">${formatDateTime(d.timestamp)}</span>
+                
+                <div style="margin-bottom: 12px;">
+                    <div style="color: #4a5568; font-size: 11px; margin-bottom: 4px;">⏰ Transaction Time</div>
+                    <div style="color: #e2e8f0; font-size: 12px;">${formatDateTime(d.timestamp)}</div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">From:</span>
-                    <span class="detail-value">${d.from_account}</span>
+                
+                <div style="margin-bottom: 8px;">
+                    <div style="color: #4a5568; font-size: 11px; margin-bottom: 4px;">🔄 Account Flow</div>
+                    <div style="background: rgba(0, 255, 135, 0.1); border-radius: 6px; padding: 6px; font-size: 11px;">
+                        <div style="color: #00ff87; margin-bottom: 2px;">📤 From: <span style="color: #e2e8f0; font-family: monospace;">${d.from_account}</span></div>
+                        <div style="color: #00d4ff;">📥 To: <span style="color: #e2e8f0; font-family: monospace;">${d.to_account}</span></div>
+                    </div>
                 </div>
-                <div class="detail-row">
-                    <span class="detail-label">To:</span>
-                    <span class="detail-value">${d.to_account}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Risk Score:</span>
-                    <span class="detail-value ${riskClass}">${suspicionScore}%</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Scenario:</span>
-                    <span class="detail-value">${d.scenario || 'Unknown'}</span>
-                </div>
+                
+                ${d.scenario ? `<div style="background: rgba(168, 85, 247, 0.1); border-radius: 6px; padding: 6px; margin-top: 8px;">
+                    <div style="color: #a855f7; font-size: 11px; font-weight: 600;">🔍 Scenario: ${d.scenario}</div>
+                </div>` : ''}
             `)
             .style('left', (event.pageX + 15) + 'px')
             .style('top', (event.pageY - 10) + 'px');
@@ -1076,34 +1736,52 @@ class ChronosTimeline {
             // Show overview statistics when no transaction is selected
             const stats = this.calculateStats();
             infoPanel.html(`
-                <h4>📊 Timeline Overview - ${this.currentScenario}</h4>
-                <div class="transaction-details">
-                    <div class="detail-item">
-                        <div class="detail-label">Total Transactions</div>
-                        <div class="detail-value">${stats.total}</div>
+                <div class="bg-gradient-to-br from-secondary/10 to-primary/10 rounded-2xl p-8 border border-secondary/30 shadow-xl">
+                    <div class="text-center mb-8">
+                        <h4 class="text-3xl font-bold bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent mb-4">
+                            📊 Timeline Overview - ${this.currentScenario.toUpperCase()}
+                        </h4>
+                        <p class="text-lg text-gray-300 leading-relaxed">Comprehensive statistical analysis of transaction patterns and risk distribution</p>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Suspicious Transactions</div>
-                        <div class="detail-value">${stats.suspicious}</div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-secondary/20 hover:border-secondary/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-4xl font-bold text-secondary mb-2">${stats.total}</div>
+                            <div class="text-sm text-gray-300 font-medium">Total Transactions</div>
+                            <div class="text-xs text-gray-400 mt-1">Processed & Analyzed</div>
+                        </div>
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-4xl font-bold text-yellow-400 mb-2">${stats.suspicious}</div>
+                            <div class="text-sm text-gray-300 font-medium">Suspicious Transactions</div>
+                            <div class="text-xs text-yellow-300 mt-1">Requires Investigation</div>
+                        </div>
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-red-400/20 hover:border-red-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-4xl font-bold text-red-400 mb-2">${stats.critical}</div>
+                            <div class="text-sm text-gray-300 font-medium">Critical Transactions</div>
+                            <div class="text-xs text-red-300 mt-1">Immediate Action Required</div>
+                        </div>
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-primary/20 hover:border-primary/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-2xl font-bold text-primary mb-2">${formatCurrency(stats.totalAmount)}</div>
+                            <div class="text-sm text-gray-300 font-medium">Total Amount</div>
+                            <div class="text-xs text-gray-400 mt-1">Transaction Volume</div>
+                        </div>
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-purple-400/20 hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-2xl font-bold text-purple-400 mb-2">${formatCurrency(stats.avgAmount)}</div>
+                            <div class="text-sm text-gray-300 font-medium">Average Amount</div>
+                            <div class="text-xs text-gray-400 mt-1">Per Transaction</div>
+                        </div>
+                        <div class="bg-dark/60 rounded-xl p-6 text-center border border-orange-400/20 hover:border-orange-400/50 transition-all duration-300 hover:transform hover:scale-105">
+                            <div class="text-4xl font-bold text-orange-400 mb-2">${(stats.avgSuspicion * 100).toFixed(1)}%</div>
+                            <div class="text-sm text-gray-300 font-medium">Average Suspicion</div>
+                            <div class="text-xs text-orange-300 mt-1">Risk Score</div>
+                        </div>
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Critical Transactions</div>
-                        <div class="detail-value">${stats.critical}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Total Amount</div>
-                        <div class="detail-value">${formatCurrency(stats.totalAmount)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Average Amount</div>
-                        <div class="detail-value">${formatCurrency(stats.avgAmount)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Average Suspicion</div>
-                        <div class="detail-value">${(stats.avgSuspicion * 100).toFixed(1)}%</div>
+                    
+                    <div class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-400/30 text-center">
+                        <div class="text-blue-400 text-lg font-semibold mb-2">💡 Interactive Analysis</div>
+                        <p class="text-gray-300 text-sm leading-relaxed">Click on any transaction point in the timeline to see detailed analysis information including risk factors, ML confidence scores, and regulatory compliance indicators.</p>
                     </div>
                 </div>
-                <p style="margin-top: 1rem; color: var(--text-gray); font-size: 0.9rem;">💡 Click on any transaction point to see detailed analysis information.</p>
             `);
         }
     }
@@ -1271,33 +1949,40 @@ class ChronosTimeline {
             .force('center', d3.forceCenter(this.width / 2, this.height / 2))
             .force('collision', d3.forceCollide().radius(30));
 
-        // Create links
+        // Create links with enhanced styling
         const link = this.g.append('g')
             .attr('class', 'links')
             .selectAll('line')
             .data(this.networkLinks)
             .enter().append('line')
             .attr('class', 'network-link')
-            .style('stroke', d => d.suspicious ? 'var(--danger-red)' : 'var(--accent-green)')
-            .style('stroke-width', d => d.suspicious ? 3 : 1)
-            .style('opacity', 0.6);
+            .style('stroke', d => d.suspicious ? '#ef4444' : '#00ff87')
+            .style('stroke-width', d => d.suspicious ? 4 : 2)
+            .style('opacity', d => d.suspicious ? 0.8 : 0.6)
+            .style('filter', d => d.suspicious ? 'drop-shadow(0 0 3px #ef4444)' : 'drop-shadow(0 0 2px #00ff87)');
 
-        // Create nodes
+        // Create nodes with enhanced styling and better visibility
         const node = this.g.append('g')
             .attr('class', 'nodes')
             .selectAll('circle')
             .data(this.networkNodes)
             .enter().append('circle')
             .attr('class', 'network-node')
-            .attr('r', d => d.type === 'account' ? (d.suspicious ? 15 : 10) : 8)
+            .attr('r', d => d.type === 'account' ? (d.suspicious ? 18 : 14) : 10)
             .style('fill', d => {
                 if (d.type === 'account') {
-                    return d.suspicious ? 'var(--danger-red)' : 'var(--accent-blue)';
+                    return d.suspicious ? '#ef4444' : '#00d4ff';
                 }
-                return 'var(--accent-green)'; // Default color for non-account nodes
+                return '#00ff87'; // Default color for non-account nodes
             })
-            .style('stroke', 'white')
-            .style('stroke-width', 2)
+            .style('stroke', '#ffffff')
+            .style('stroke-width', 3)
+            .style('filter', d => {
+                if (d.type === 'account') {
+                    return d.suspicious ? 'drop-shadow(0 0 8px #ef4444)' : 'drop-shadow(0 0 6px #00d4ff)';
+                }
+                return 'drop-shadow(0 0 4px #00ff87)';
+            })
             .call(d3.drag()
                 .on('start', (event, d) => {
                     if (!event.active) this.simulation.alphaTarget(0.3).restart();
@@ -1314,20 +1999,28 @@ class ChronosTimeline {
                     d.fy = null;
                 }))
             .on('click', (event, d) => this.selectNetworkNode(d))
+            .on('dblclick', (event, d) => this.showNetworkOverview())
+            .on('contextmenu', (event, d) => {
+                event.preventDefault();
+                this.showNetworkOverview();
+            })
             .on('mouseover', (event, d) => this.showNetworkTooltip(event, d))
             .on('mouseout', () => this.hideTooltip());
 
-        // Add labels
+        // Add enhanced labels with better readability
         const label = this.g.append('g')
             .attr('class', 'labels')
             .selectAll('text')
             .data(this.networkNodes)
             .enter().append('text')
             .attr('class', 'network-label')
-            .style('font-size', '10px')
-            .style('fill', 'var(--text-light)')
+            .style('font-size', '12px')
+            .style('font-weight', '600')
+            .style('fill', '#e2e8f0')
             .style('text-anchor', 'middle')
             .style('pointer-events', 'none')
+            .style('text-shadow', '1px 1px 2px rgba(0, 0, 0, 0.8)')
+            .style('filter', 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))')
             .text(d => d.label);
 
         // Update positions on simulation tick
@@ -1474,13 +2167,28 @@ class ChronosTimeline {
 
     showNetworkTooltip(event, d) {
         const content = d.type === 'account' 
-            ? `Account: ${d.id}<br/>Transactions: ${d.transactions.length}<br/>Suspicious: ${d.suspicious ? 'Yes' : 'No'}`
-            : `Network Node<br/>Type: ${d.type || 'Unknown'}`;
+            ? `
+                <div style="font-weight: bold; color: #00ff87; margin-bottom: 8px;">🏦 Account Node</div>
+                <div style="margin-bottom: 4px;"><strong>ID:</strong> ${d.id.substring(0, 12)}...</div>
+                <div style="margin-bottom: 4px;"><strong>Transactions:</strong> ${d.transactions.length}</div>
+                <div style="margin-bottom: 4px;"><strong>Suspicious:</strong> <span style="color: ${d.suspicious ? '#ef4444' : '#10b981'}">${d.suspicious ? 'Yes' : 'No'}</span></div>
+                <div style="margin-bottom: 4px;"><strong>Connections:</strong> ${this.getConnectedAccounts(d).length}</div>
+                <div style="font-size: 11px; color: #a0aec0; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 6px;">
+                    💡 <strong>Click:</strong> Select node<br/>
+                    🖱️ <strong>Double-click:</strong> Open full network<br/>
+                    🖱️ <strong>Right-click:</strong> Network overview
+                </div>
+            `
+            : `
+                <div style="font-weight: bold; color: #00ff87; margin-bottom: 8px;">🔗 Network Node</div>
+                <div style="margin-bottom: 4px;"><strong>Type:</strong> ${d.type || 'Unknown'}</div>
+                <div style="font-size: 11px; color: #a0aec0; margin-top: 8px;">💡 Double-click for full network view</div>
+            `;
             
         this.tooltip
             .style('opacity', 1)
             .html(content)
-            .style('left', (event.pageX + 10) + 'px')
+            .style('left', (event.pageX + 15) + 'px')
             .style('top', (event.pageY - 10) + 'px');
     }
 
@@ -1513,8 +2221,11 @@ class ChronosTimeline {
                 </div>
             </div>
             <div class="network-actions">
-                <button onclick="window.TriNetra.getChronos().clearSelection()" class="control-button">
+                <button onclick="window.TriNetra.getChronos().clearSelection()" class="control-button" style="margin-right: 10px;">
                     Clear Selection
+                </button>
+                <button onclick="window.TriNetra.getChronos().showNetworkOverview()" class="control-button" style="background: rgba(0, 255, 135, 0.2); border: 1px solid #00ff87; color: #00ff87;">
+                    🕸️ Open Full Network
                 </button>
             </div>
         `;
