@@ -47,13 +47,10 @@ class EnhancedHydraAI {
             console.error('❌ HYDRA: Stop battle button not found');
         }
 
-        // Legacy button support
+        // Generate pattern button removed as requested
         if (generateButton) {
-            console.log('✅ HYDRA: Generate pattern button found, adding listener');
-            generateButton.addEventListener('click', () => {
-                console.log('🔥 HYDRA: Generate pattern button clicked');
-                this.generatePattern();
-            });
+            console.log('⚠️ HYDRA: Generate pattern button found but feature disabled');
+            // Feature removed per user request
         }
 
         if (simulationButton) {
@@ -142,14 +139,39 @@ class EnhancedHydraAI {
             <div class="enhanced-hydra-battlefield">
                 <!-- Battle Arena with Enhanced Graphics -->
                 <div class="enhanced-battle-arena">
-                    <!-- Generator AI -->
+                    <!-- AI Defender -->
                     <div class="enhanced-ai-entity generator" id="generator-entity">
                         <div class="entity-glow generator-glow"></div>
                         <div class="entity-avatar-container">
-                            <div class="entity-avatar generator-avatar">🛡️</div>
+                            <div class="entity-avatar generator-avatar">
+                                <svg width="80" height="80" viewBox="0 0 80 80" class="ai-defender-image">
+                                    <defs>
+                                        <linearGradient id="defenderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#00ff87;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- AI Defender Shield -->
+                                    <polygon points="40,5 60,15 70,35 60,55 40,65 20,55 10,35 20,15" 
+                                             fill="url(#defenderGradient)" stroke="#ffffff" stroke-width="2"/>
+                                    <!-- Defensive Core -->
+                                    <circle cx="40" cy="35" r="15" fill="#ffffff" opacity="0.9"/>
+                                    <circle cx="40" cy="35" r="8" fill="#00d4ff"/>
+                                    <!-- Neural Network Pattern -->
+                                    <g stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.8">
+                                        <line x1="32" y1="27" x2="48" y2="43"/>
+                                        <line x1="48" y1="27" x2="32" y2="43"/>
+                                        <circle cx="32" cy="27" r="2" fill="#ffffff"/>
+                                        <circle cx="48" cy="27" r="2" fill="#ffffff"/>
+                                        <circle cx="32" cy="43" r="2" fill="#ffffff"/>
+                                        <circle cx="48" cy="43" r="2" fill="#ffffff"/>
+                                    </g>
+                                </svg>
+                            </div>
                             <div class="power-ring generator-ring"></div>
                         </div>
-                        <div class="entity-name">AI Generator</div>
+                        <div class="entity-name">🛡️ AI Defender</div>
+                        <div class="entity-description">Protects against financial crime patterns</div>
                         <div class="entity-stats">
                             <div class="stat-item">
                                 <div class="stat-label">Health</div>
@@ -182,14 +204,37 @@ class EnhancedHydraAI {
                         <div class="energy-beam" id="energy-beam"></div>
                     </div>
                     
-                    <!-- Attacker AI -->
+                    <!-- AI Attacker -->
                     <div class="enhanced-ai-entity attacker" id="attacker-entity">
                         <div class="entity-glow attacker-glow"></div>
                         <div class="entity-avatar-container">
-                            <div class="entity-avatar attacker-avatar">⚔️</div>
+                            <div class="entity-avatar attacker-avatar">
+                                <svg width="80" height="80" viewBox="0 0 80 80" class="ai-attacker-image">
+                                    <defs>
+                                        <linearGradient id="attackerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#ffa500;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                    <!-- AI Attacker Blade -->
+                                    <polygon points="40,5 65,25 55,40 40,65 25,40 15,25" 
+                                             fill="url(#attackerGradient)" stroke="#ffffff" stroke-width="2"/>
+                                    <!-- Attack Core -->
+                                    <polygon points="40,20 52,32 40,44 28,32" fill="#ffffff" opacity="0.9"/>
+                                    <polygon points="40,25 47,32 40,39 33,32" fill="#ff6b6b"/>
+                                    <!-- Lightning Pattern -->
+                                    <g stroke="#ffffff" stroke-width="2" fill="none" opacity="0.8">
+                                        <path d="M32 15 L35 25 L30 25 L33 35"/>
+                                        <path d="M48 15 L45 25 L50 25 L47 35"/>
+                                        <path d="M25 45 L30 50 L25 55"/>
+                                        <path d="M55 45 L50 50 L55 55"/>
+                                    </g>
+                                </svg>
+                            </div>
                             <div class="power-ring attacker-ring"></div>
                         </div>
-                        <div class="entity-name">AI Attacker</div>
+                        <div class="entity-name">⚔️ AI Attacker</div>
+                        <div class="entity-description">Generates adversarial crime patterns</div>
                         <div class="entity-stats">
                             <div class="stat-item">
                                 <div class="stat-label">Health</div>
@@ -210,11 +255,21 @@ class EnhancedHydraAI {
                     </div>
                 </div>
                 
+                <!-- Battle Instructions -->
+                <div class="battle-instructions">
+                    <div class="instruction-card">
+                        <h4>🎯 How HYDRA Works</h4>
+                        <p><strong>AI Defender:</strong> Protects against financial crime by detecting suspicious patterns</p>
+                        <p><strong>AI Attacker:</strong> Generates new adversarial patterns to test defenses</p>
+                        <p><strong>Battle Mode:</strong> Watch AI systems compete to improve detection capabilities</p>
+                    </div>
+                </div>
+                
                 <!-- Enhanced Battle Log with Real-time Stats -->
                 <div class="enhanced-battle-dashboard">
                     <div class="battle-log-enhanced" id="battle-log-enhanced">
                         <div class="log-header-enhanced">
-                            <div class="log-title">🔥 Battle Log</div>
+                            <div class="log-title">🔥 Real-Time Battle Log</div>
                             <div class="battle-status" id="battle-status">READY</div>
                         </div>
                         <div class="log-content-enhanced" id="log-content-enhanced">
@@ -255,6 +310,7 @@ class EnhancedHydraAI {
         this.addEnhancedBattleStyles();
         this.initializeBattleCanvas();
         this.startIdleAnimations();
+        this.addTooltips();
         
         // Make instance globally accessible for debugging
         window.hydraDebug = {
@@ -830,6 +886,107 @@ class EnhancedHydraAI {
                 }
             }
             
+            /* Enhanced HYDRA Control Styling */
+            .section-description {
+                color: #aaa;
+                font-size: 0.95rem;
+                margin-bottom: 1.5rem;
+                text-align: center;
+                font-style: italic;
+            }
+            
+            .control-group {
+                display: flex;
+                gap: 0.8rem;
+                margin-bottom: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .primary-controls {
+                border-bottom: 1px solid rgba(0, 255, 135, 0.2);
+                padding-bottom: 1rem;
+            }
+            
+            .secondary-controls {
+                justify-content: space-around;
+            }
+            
+            .control-button {
+                position: relative;
+                padding: 0.8rem 1.5rem;
+                border: 2px solid rgba(0, 212, 255, 0.3);
+                background: rgba(26, 26, 46, 0.8);
+                color: #ffffff;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            }
+            
+            .control-button:hover {
+                border-color: rgba(0, 255, 135, 0.6);
+                box-shadow: 0 6px 25px rgba(0, 255, 135, 0.3);
+                transform: translateY(-2px);
+            }
+            
+            .control-button.primary {
+                background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 255, 135, 0.2));
+                border-color: rgba(0, 255, 135, 0.6);
+                box-shadow: 0 6px 20px rgba(0, 255, 135, 0.3);
+            }
+            
+            .control-button.primary:hover {
+                background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 255, 135, 0.3));
+                transform: translateY(-3px) scale(1.05);
+            }
+            
+            .export-button {
+                border-color: rgba(168, 85, 247, 0.5);
+                color: #a855f7;
+            }
+            
+            .export-button:hover {
+                border-color: rgba(168, 85, 247, 0.8);
+                box-shadow: 0 6px 25px rgba(168, 85, 247, 0.3);
+            }
+            
+            /* Tooltip Styling */
+            .control-button[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                bottom: 120%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.9);
+                color: #ffffff;
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                font-size: 0.8rem;
+                font-weight: 400;
+                white-space: nowrap;
+                z-index: 1000;
+                border: 1px solid rgba(0, 255, 135, 0.3);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            }
+            
+            .control-button[title]:hover::before {
+                content: '';
+                position: absolute;
+                bottom: 110%;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid rgba(0, 0, 0, 0.9);
+                z-index: 1001;
+            }
+
             /* Responsive Design */
             @media (max-width: 768px) {
                 .enhanced-battle-arena {
@@ -854,6 +1011,16 @@ class EnhancedHydraAI {
                 
                 .battle-metrics {
                     grid-template-columns: repeat(2, 1fr);
+                }
+                
+                .control-group {
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .control-button {
+                    width: 100%;
+                    max-width: 280px;
                 }
             }
         `;
@@ -1349,6 +1516,37 @@ class EnhancedHydraAI {
         this.addEnhancedLogEntry('🔄 Systems reset. Ready for next battle...', 'info');
     }
 
+    addTooltips() {
+        // Add tooltips to control buttons for better user experience
+        const tooltips = {
+            'start-battle': 'Start an AI battle between defender and attacker systems',
+            'stop-battle': 'Stop the current AI battle simulation',
+            'generate-pattern': 'Generate a new adversarial attack pattern',
+            'run-simulation': 'Run multiple AI battle rounds automatically',
+            'export-hydra': 'Export battle results and analytics as PDF'
+        };
+        
+        Object.keys(tooltips).forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            if (button) {
+                button.title = tooltips[buttonId];
+                button.setAttribute('data-tooltip', tooltips[buttonId]);
+            }
+        });
+        
+        // Add help text to AI entities
+        const defenderEntity = document.getElementById('generator-entity');
+        const attackerEntity = document.getElementById('attacker-entity');
+        
+        if (defenderEntity) {
+            defenderEntity.title = 'AI Defender: Uses machine learning to detect suspicious financial patterns and protect against threats';
+        }
+        
+        if (attackerEntity) {
+            attackerEntity.title = 'AI Attacker: Generates sophisticated adversarial patterns to test and improve defense systems';
+        }
+    }
+
     stopBattle() {
         console.log('🛑 HYDRA: stopBattle() method called');
         console.log('🔍 HYDRA: Current isRunning state:', this.isRunning);
@@ -1378,6 +1576,265 @@ class EnhancedHydraAI {
         setTimeout(() => {
             this.resetEnhancedBattle();
         }, 2000);
+    }
+
+    // Missing method implementations
+    async generatePattern() {
+        console.log('🔥 HYDRA: generatePattern() method called');
+        
+        try {
+            // Generate new adversarial pattern
+            const response = await api.generateAdversarialPattern();
+            console.log('🔍 HYDRA: Generated pattern response:', response);
+            
+            if (response && response.status === 'success') {
+                // Display pattern in battle arena
+                this.displayGeneratedPattern(response.pattern || response);
+                this.addEnhancedLogEntry('New adversarial pattern generated successfully', 'success');
+                showNotification('Attack pattern generated!', 'success');
+            } else {
+                throw new Error('Pattern generation failed');
+            }
+        } catch (error) {
+            console.error('❌ HYDRA: Pattern generation error:', error);
+            this.addEnhancedLogEntry('Pattern generation failed', 'error');
+            showNotification('Pattern generation failed', 'error');
+        }
+    }
+
+    displayGeneratedPattern(patternData) {
+        console.log('🎯 HYDRA: Displaying pattern:', patternData);
+        
+        const battleArena = document.getElementById('ai-battle');
+        if (!battleArena) return;
+
+        const patternDisplay = document.createElement('div');
+        patternDisplay.className = 'bg-red-500/20 border border-red-500/30 rounded-lg p-4 mb-4 animate-pulse';
+        patternDisplay.innerHTML = `
+            <h5 class="text-red-400 font-semibold mb-2 flex items-center">
+                🔥 New Attack Pattern Generated
+                <span class="ml-2 text-xs bg-red-500/20 text-red-300 px-2 py-1 rounded">AI Generated</span>
+            </h5>
+            <div class="space-y-2 text-sm text-gray-300">
+                <div class="flex justify-between">
+                    <span>Pattern ID:</span>
+                    <span class="text-red-400 font-mono">${patternData.pattern_id || patternData.id || 'PAT_' + Date.now().toString(36).toUpperCase()}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Complexity:</span>
+                    <span class="text-yellow-400">${Math.round((patternData.complexity || 0.8) * 100)}%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Evasion Score:</span>
+                    <span class="text-orange-400">${Math.round((patternData.evasion_score || 0.7) * 100)}%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Risk Level:</span>
+                    <span class="text-red-400 font-semibold">${patternData.risk_level || 'HIGH'}</span>
+                </div>
+            </div>
+            <div class="mt-3 p-3 bg-dark/40 rounded border-l-2 border-red-400">
+                <div class="text-xs text-gray-400 mb-1">Pattern Description:</div>
+                <div class="text-sm text-gray-300">${patternData.description || 'Advanced adversarial pattern designed to test AI defense systems through sophisticated evasion techniques.'}</div>
+            </div>
+        `;
+        
+        battleArena.appendChild(patternDisplay);
+        
+        // Add animation effect
+        setTimeout(() => {
+            patternDisplay.classList.add('animate-bounce');
+        }, 100);
+        
+        // Remove after 15 seconds
+        setTimeout(() => {
+            if (patternDisplay.parentNode) {
+                patternDisplay.style.transition = 'all 0.5s ease-out';
+                patternDisplay.style.opacity = '0';
+                patternDisplay.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    patternDisplay.remove();
+                }, 500);
+            }
+        }, 15000);
+    }
+
+    async runSimulation() {
+        console.log('🧪 HYDRA: runSimulation() method called');
+        
+        try {
+            this.addEnhancedLogEntry('Starting battle simulation...', 'info');
+            showNotification('Running AI battle simulation...', 'info');
+            
+            const rounds = 5;
+            let simulationResults = {
+                rounds: rounds,
+                wins: { generator: 0, attacker: 0 },
+                results: []
+            };
+            
+            for (let i = 0; i < rounds; i++) {
+                this.addEnhancedLogEntry(`Simulation Round ${i + 1}/${rounds} starting...`, 'info');
+                
+                // Simulate battle round
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const roundResult = {
+                    round: i + 1,
+                    pattern: this.getRandomAttackType(),
+                    complexity: Math.random() * 0.4 + 0.6, // 60-100%
+                    detected: Math.random() > 0.3, // 70% detection rate
+                    confidence: Math.random() * 0.3 + 0.7, // 70-100%
+                    duration: Math.random() * 2000 + 1000 // 1-3 seconds
+                };
+                
+                if (roundResult.detected) {
+                    simulationResults.wins.generator++;
+                    this.battleStats.generator.wins++;
+                    this.addEnhancedLogEntry(`Round ${i + 1}: Defender detected attack (${Math.round(roundResult.confidence * 100)}% confidence)`, 'success');
+                } else {
+                    simulationResults.wins.attacker++;
+                    this.battleStats.attacker.wins++;
+                    this.addEnhancedLogEntry(`Round ${i + 1}: Attacker evaded detection`, 'warning');
+                }
+                
+                simulationResults.results.push(roundResult);
+                
+                // Update metrics display
+                this.updateSimulationMetrics();
+            }
+            
+            // Final results
+            const detectionRate = (simulationResults.wins.generator / rounds * 100).toFixed(1);
+            this.addEnhancedLogEntry(`Simulation complete! Detection rate: ${detectionRate}%`, 'success');
+            showNotification(`Simulation completed! Detection rate: ${detectionRate}%`, 'success');
+            
+            // Store simulation data for export
+            this.lastSimulation = simulationResults;
+            
+        } catch (error) {
+            console.error('❌ HYDRA: Simulation error:', error);
+            this.addEnhancedLogEntry('Simulation failed', 'error');
+            showNotification('Simulation failed', 'error');
+        }
+    }
+
+    updateSimulationMetrics() {
+        // Update battle metrics display
+        const defenderWinsEl = document.getElementById('defender-wins');
+        const attackerWinsEl = document.getElementById('attacker-wins');
+        const detectionRateEl = document.getElementById('detection-rate');
+        const totalBattlesEl = document.getElementById('total-battles');
+
+        if (defenderWinsEl) defenderWinsEl.textContent = this.battleStats.generator.wins;
+        if (attackerWinsEl) attackerWinsEl.textContent = this.battleStats.attacker.wins;
+        
+        const totalBattles = this.battleStats.generator.wins + this.battleStats.attacker.wins;
+        if (totalBattlesEl) totalBattlesEl.textContent = totalBattles;
+        
+        if (detectionRateEl && totalBattles > 0) {
+            const detectionRate = Math.round((this.battleStats.generator.wins / totalBattles) * 100);
+            detectionRateEl.textContent = detectionRate + '%';
+        }
+    }
+
+    async exportReport() {
+        console.log('📄 HYDRA: exportReport() method called');
+        
+        try {
+            // Check if PDF libraries are available
+            if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
+                console.warn('PDF libraries not loaded properly, using fallback method');
+                this.fallbackExport();
+                return;
+            }
+
+            showLoading();
+            showNotification('Generating HYDRA battle report...', 'info');
+
+            // Import PDF generator
+            const TriNetraPDFGenerator = (await import('./pdf-generator.js')).default;
+            const pdfGenerator = new TriNetraPDFGenerator();
+
+            // Prepare battle data for report
+            const battleData = {
+                rounds: this.lastSimulation?.rounds || 0,
+                total_detected: this.battleStats.generator.wins,
+                detection_rate: this.battleStats.generator.wins + this.battleStats.attacker.wins > 0 
+                    ? this.battleStats.generator.wins / (this.battleStats.generator.wins + this.battleStats.attacker.wins) 
+                    : 0,
+                results: this.lastSimulation?.results || []
+            };
+
+            // Generate comprehensive battle history
+            const battleHistory = {
+                session_start: new Date().toISOString(),
+                total_rounds: battleData.rounds,
+                defender_performance: {
+                    wins: this.battleStats.generator.wins,
+                    accuracy: battleData.detection_rate,
+                    avg_response_time: '1.2s'
+                },
+                attacker_performance: {
+                    wins: this.battleStats.attacker.wins,
+                    evasion_rate: 1 - battleData.detection_rate,
+                    complexity_avg: 0.78
+                }
+            };
+
+            // Generate PDF report using CHRONOS-style formatting
+            const doc = await pdfGenerator.generateHydraReport(battleData, battleHistory);
+            
+            // Download the PDF
+            const filename = `HYDRA_Battle_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            await pdfGenerator.downloadPDF(filename);
+            
+            showNotification('HYDRA battle report exported successfully!', 'success');
+            this.addEnhancedLogEntry('Battle report exported to PDF', 'success');
+            
+        } catch (error) {
+            console.error('❌ HYDRA: Export error:', error);
+            showNotification('Export failed, using fallback method', 'warning');
+            this.fallbackExport();
+        } finally {
+            hideLoading();
+        }
+    }
+
+    fallbackExport() {
+        try {
+            // Create a simple JSON export as fallback
+            const reportData = {
+                title: 'HYDRA AI Battle Report',
+                generated_at: new Date().toISOString(),
+                battle_stats: this.battleStats,
+                simulation_data: this.lastSimulation,
+                summary: {
+                    total_battles: this.battleStats.generator.wins + this.battleStats.attacker.wins,
+                    detection_rate: this.battleStats.generator.wins + this.battleStats.attacker.wins > 0 
+                        ? ((this.battleStats.generator.wins / (this.battleStats.generator.wins + this.battleStats.attacker.wins)) * 100).toFixed(1) + '%'
+                        : '0%',
+                    defender_wins: this.battleStats.generator.wins,
+                    attacker_wins: this.battleStats.attacker.wins
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `HYDRA_Battle_Report_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showNotification('Battle data exported as JSON file', 'success');
+            this.addEnhancedLogEntry('Battle data exported successfully', 'success');
+        } catch (error) {
+            console.error('❌ HYDRA: Fallback export failed:', error);
+            showNotification('Export failed completely', 'error');
+        }
     }
 }
 

@@ -1,17 +1,26 @@
 export async function initSarMap() {
-    const existingMap = document.getElementById('sar-map');
-    if (existingMap) existingMap.remove();
-
-    const mapContainer = document.createElement('div');
-    mapContainer.id = 'sar-map';
+    // Check if map container already exists in the DOM
+    let mapContainer = document.getElementById('sar-map');
+    
+    if (!mapContainer) {
+        // Find the map container that should already exist in the HTML
+        mapContainer = document.querySelector('#sar-map');
+        
+        if (!mapContainer) {
+            console.error('Map container #sar-map not found in DOM');
+            return;
+        }
+    }
+    
+    // Clear any existing map content
+    mapContainer.innerHTML = '';
+    
+    // Set styles for the existing container
     mapContainer.style.width = '100%';
-    mapContainer.style.height = '500px';
-    mapContainer.style.marginTop = '10px';
+    mapContainer.style.height = '400px';
     mapContainer.style.border = '2px solid #00ff87';
     mapContainer.style.borderRadius = '8px';
-    mapContainer.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
-
-    document.querySelector('.autosar-section').appendChild(mapContainer);
+    mapContainer.style.boxShadow = '0 4px 20px rgba(0, 255, 135, 0.2)';
 
     const sarMap = L.map('sar-map', { minZoom: 3, maxZoom: 10 }).setView([20.5937, 78.9629], 5);
 

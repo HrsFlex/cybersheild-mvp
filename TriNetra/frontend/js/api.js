@@ -69,15 +69,29 @@ class TriNetraAPI {
     getMockData(endpoint) {
         // Return appropriate mock data based on endpoint
         if (endpoint.includes('/chronos/timeline')) {
+            const data = this.generateSampleTransactions();
             return {
                 status: 'success',
-                data: this.generateSampleTransactions(),
-                summary: {
-                    total_transactions: 50,
-                    suspicious_count: 12,
-                    amount_range: { min: 100, max: 50000 }
+                data: data,
+                total_transactions: data.length,
+                time_quantum: '1m',
+                date_range: {
+                    start: new Date(Date.now() - 30*24*60*60*1000).toISOString(),
+                    end: new Date().toISOString()
                 },
-                message: "Demo mode - Using sample data"
+                layering_summary: this.generateLayeringSummary(data),
+                message: "Demo mode - Using enhanced sample data"
+            };
+        }
+        
+        if (endpoint.includes('/chronos/search')) {
+            return {
+                status: 'success',
+                results: this.generateSampleTransactions().slice(0, 5),
+                total_matches: 5,
+                search_term: 'demo',
+                search_type: 'all',
+                message: "Demo mode - Sample search results"
             };
         }
         
@@ -216,8 +230,23 @@ class TriNetraAPI {
     generateSampleTransactions() {
         const transactions = [];
         const accounts = ['ACC_001', 'ACC_002', 'ACC_003', 'ACC_004', 'ACC_005', 'ACC_006'];
-        const types = ['wire_transfer', 'cash_deposit', 'check_deposit', 'ach_transfer'];
+        const types = ['NEFT', 'RTGS', 'IMPS', 'UPI', 'Wire Transfer', 'Cryptocurrency', 'Hawala'];
         const suspicionLevels = [0.1, 0.3, 0.5, 0.7, 0.9];
+        const scenarios = ['terrorist_financing', 'crypto_sanctions', 'human_trafficking'];
+        const patternTypes = ['rapid_sequence', 'smurfing', 'layering', 'structuring'];
+        
+        // Indian locations
+        const locations = [
+            { city: 'Mumbai', state: 'Maharashtra', country: 'India', region: 'Western' },
+            { city: 'Delhi', state: 'Delhi', country: 'India', region: 'Northern' },
+            { city: 'Bangalore', state: 'Karnataka', country: 'India', region: 'Southern' },
+            { city: 'Chennai', state: 'Tamil Nadu', country: 'India', region: 'Southern' },
+            { city: 'Kolkata', state: 'West Bengal', country: 'India', region: 'Eastern' },
+            { city: 'Dubai', state: 'Dubai', country: 'UAE', region: 'Middle East' },
+            { city: 'Karachi', state: 'Karachi', country: 'Pakistan', region: 'South Asia' }
+        ];
+        
+        const banks = ['State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Axis Bank', 'Punjab National Bank'];
         
         const baseTime = new Date('2024-01-01').getTime();
         
@@ -230,16 +259,45 @@ class TriNetraAPI {
                 toAccount = accounts[Math.floor(Math.random() * accounts.length)];
             }
             
+            const suspicionScore = suspicionLevels[Math.floor(Math.random() * suspicionLevels.length)];
+            const location = locations[Math.floor(Math.random() * locations.length)];
+            const transactionMethod = types[Math.floor(Math.random() * types.length)];
+            
+            // Generate layering analysis
+            const layeringAnalysis = this.generateLayeringAnalysis(suspicionScore, amount);
+            
+            // Country risk assessment
+            const countryRiskLevel = this.getCountryRiskLevel(location.country);
+            
             transactions.push({
                 id: `TXN_${String(i + 1).padStart(3, '0')}`,
+                transaction_id: `TXN_${String(i + 1).padStart(3, '0')}`,
                 timestamp: timestamp.toISOString(),
                 from_account: fromAccount,
                 to_account: toAccount,
                 amount: Math.round(amount * 100) / 100,
-                transaction_type: types[Math.floor(Math.random() * types.length)],
-                suspicion_score: suspicionLevels[Math.floor(Math.random() * suspicionLevels.length)],
+                transaction_type: transactionMethod,
+                suspicious_score: suspicionScore,
+                scenario: scenarios[Math.floor(Math.random() * scenarios.length)],
+                pattern_type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
+                
+                // Enhanced fields
+                aadhar_location: {
+                    ...location,
+                    lat: this.getLocationCoordinates(location.city).lat,
+                    lng: this.getLocationCoordinates(location.city).lng
+                },
+                layering_analysis: layeringAnalysis,
+                country_risk_level: countryRiskLevel,
+                transaction_method: transactionMethod,
+                bank_details: {
+                    bank_name: banks[Math.floor(Math.random() * banks.length)],
+                    branch_code: `BR${Math.floor(Math.random() * 9000) + 1000}`,
+                    ifsc_code: `SBIN${Math.floor(Math.random() * 900000) + 100000}`,
+                    swift_code: `SWIFT${Math.floor(Math.random() * 90000) + 10000}`
+                },
+                
                 description: `Sample transaction ${i + 1}`,
-                location: 'Demo Location',
                 flags: Math.random() > 0.7 ? ['large_amount'] : []
             });
         }
@@ -315,13 +373,119 @@ Generated by TriNetra Auto-SAR System (Demo Mode)
         return reportContent;
     }
 
+    // Helper methods for enhanced mock data
+    generateLayeringAnalysis(suspicionScore, amount) {
+        const layeringAnalysis = {
+            layer_1_extraction: {
+                description: 'Transaction data extraction and basic pattern identification',
+                patterns_detected: [],
+                risk_indicators: []
+            },
+            layer_2_processing: {
+                description: 'Advanced pattern analysis and relationship mapping',
+                connected_accounts: Math.floor(Math.random() * 13) + 2,
+                temporal_patterns: [],
+                amount_patterns: []
+            },
+            layer_3_integration: {
+                description: 'Cross-reference with known threat patterns and geolocation',
+                threat_level: 'LOW',
+                geolocation_risk: 'NORMAL',
+                pattern_match_confidence: 0.0
+            }
+        };
+        
+        // Layer 1: Basic pattern detection
+        if (amount < 10000) {
+            layeringAnalysis.layer_1_extraction.patterns_detected.push('Small value transaction');
+        } else if (amount > 500000) {
+            layeringAnalysis.layer_1_extraction.patterns_detected.push('Large value transaction');
+            layeringAnalysis.layer_1_extraction.risk_indicators.push('High amount alert');
+        }
+        
+        // Layer 2: Advanced processing
+        if (suspicionScore > 0.7) {
+            layeringAnalysis.layer_2_processing.temporal_patterns.push('Suspicious timing patterns');
+            layeringAnalysis.layer_2_processing.amount_patterns.push('Irregular amount structure');
+        }
+        
+        // Layer 3: Integration and final assessment
+        if (suspicionScore > 0.8) {
+            layeringAnalysis.layer_3_integration.threat_level = 'CRITICAL';
+            layeringAnalysis.layer_3_integration.pattern_match_confidence = suspicionScore;
+        } else if (suspicionScore > 0.5) {
+            layeringAnalysis.layer_3_integration.threat_level = 'MEDIUM';
+            layeringAnalysis.layer_3_integration.pattern_match_confidence = suspicionScore;
+        }
+        
+        return layeringAnalysis;
+    }
+
+    getCountryRiskLevel(country) {
+        const highRiskCountries = ['Pakistan', 'Afghanistan', 'North Korea', 'Iran'];
+        const mediumRiskCountries = ['UAE', 'Malaysia', 'Thailand', 'Myanmar'];
+        
+        if (highRiskCountries.includes(country)) {
+            return { level: 3, description: 'High Risk Country', color: '#ff4444' };
+        } else if (mediumRiskCountries.includes(country)) {
+            return { level: 2, description: 'Medium Risk Country', color: '#ffaa00' };
+        } else {
+            return { level: 1, description: 'Low Risk Country', color: '#44ff44' };
+        }
+    }
+
+    getLocationCoordinates(city) {
+        const coordinates = {
+            'Mumbai': { lat: 19.0760, lng: 72.8777 },
+            'Delhi': { lat: 28.6139, lng: 77.2090 },
+            'Bangalore': { lat: 12.9716, lng: 77.5946 },
+            'Chennai': { lat: 13.0827, lng: 80.2707 },
+            'Kolkata': { lat: 22.5726, lng: 88.3639 },
+            'Dubai': { lat: 25.2048, lng: 55.2708 },
+            'Karachi': { lat: 24.8607, lng: 67.0011 }
+        };
+        
+        return coordinates[city] || { lat: 0, lng: 0 };
+    }
+
+    generateLayeringSummary(transactions) {
+        const totalTransactions = transactions.length;
+        const highRisk = transactions.filter(tx => tx.suspicious_score > 0.8).length;
+        const mediumRisk = transactions.filter(tx => tx.suspicious_score > 0.5 && tx.suspicious_score <= 0.8).length;
+        const lowRisk = totalTransactions - highRisk - mediumRisk;
+        
+        return {
+            total_transactions: totalTransactions,
+            risk_distribution: {
+                critical: highRisk,
+                medium: mediumRisk,
+                low: lowRisk
+            },
+            layering_effectiveness: {
+                layer_1_detection_rate: Math.random() * 0.1 + 0.85,
+                layer_2_processing_rate: Math.random() * 0.15 + 0.75,
+                layer_3_integration_rate: Math.random() * 0.2 + 0.60
+            }
+        };
+    }
+
     // CHRONOS API calls
-    async getTimelineData(scenario = 'all', timeRange = '30d') {
-        return this.request(`/chronos/timeline?scenario=${scenario}&time_range=${timeRange}`);
+    async getTimelineData(scenario = 'all', timeQuantum = '1m') {
+        return this.request(`/chronos/timeline?scenario=${scenario}&time_quantum=${timeQuantum}`);
     }
 
     async getPatternAnalysis() {
         return this.request('/chronos/patterns');
+    }
+
+    async searchTransactions(searchTerm, searchType = 'all') {
+        return this.request('/chronos/search', {
+            method: 'POST',
+            body: JSON.stringify({
+                term: searchTerm,
+                type: searchType
+            })
+        });
     }
 
     // HYDRA API calls

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="triNetraGradient192" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ff87;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Background Circle -->
+  <circle cx="96" cy="96" r="88" fill="url(#triNetraGradient192)" stroke="#ffffff" stroke-width="8"/>
+  <!-- Third Eye Symbol -->
+  <ellipse cx="96" cy="96" rx="48" ry="36" fill="#ffffff" opacity="0.9"/>
+  <!-- Pupil -->
+  <circle cx="96" cy="96" r="18" fill="#00d4ff"/>
+  <!-- Inner Light -->
+  <circle cx="102" cy="90" r="6" fill="#ffffff" opacity="0.8"/>
+  <!-- Neural Network Pattern -->
+  <g stroke="#ffffff" stroke-width="3" fill="none" opacity="0.6">
+    <line x1="64" y1="64" x2="128" y2="128"/>
+    <line x1="128" y1="64" x2="64" y2="128"/>
+    <circle cx="64" cy="64" r="4" fill="#ffffff"/>
+    <circle cx="128" cy="64" r="4" fill="#ffffff"/>
+    <circle cx="64" cy="128" r="4" fill="#ffffff"/>
+    <circle cx="128" cy="128" r="4" fill="#ffffff"/>
+  </g>
+</svg>

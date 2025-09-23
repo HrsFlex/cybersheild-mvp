@@ -65,13 +65,21 @@ cd ..
 echo "🔄 Starting frontend server..."
 cd frontend
 
-# Check if node_modules exists
+# Check if node_modules exists and install/update dependencies
 if [ ! -d "node_modules" ]; then
     echo "🔄 Installing frontend dependencies..."
     npm install
+else
+    echo "🔄 Updating frontend dependencies..."
+    npm install
 fi
 
+# Remove old PDF dependencies that cause conflicts
+echo "🧹 Cleaning up conflicting dependencies..."
+npm uninstall jspdf html2canvas jspdf-autotable 2>/dev/null || true
+
 # Start frontend server
+echo "🚀 Starting Vite development server..."
 npm run dev &
 FRONTEND_PID=$!
 echo "✅ Frontend started (PID: $FRONTEND_PID) - http://localhost:5175"
@@ -81,11 +89,38 @@ cd ..
 echo ""
 echo "🎉 TriNetra is now running!"
 echo "=================================="
-echo "Frontend: http://localhost:5175"
-echo "Backend:  http://localhost:5001"
-echo "Health:   http://localhost:5001/api/health"
+echo "🌐 Frontend: http://localhost:5175"
+echo "⚙️  Backend:  http://localhost:5001"
+echo "❤️  Health:   http://localhost:5001/api/health"
+echo ""
+echo "📱 Login Page:   http://localhost:5175/login.html"
+echo "🏠 Dashboard:    http://localhost:5175/dashboard.html"
+echo ""
+echo "⚡ Features Available:"
+echo "   🕐 CHRONOS Timeline Analysis"
+echo "   🐍 HYDRA AI Red-Team Battle"
+echo "   📋 Auto-SAR Report Generation"
 echo ""
 echo "Press Ctrl+C to stop all services"
+echo ""
+
+# Wait a moment for servers to fully start
+sleep 2
+
+# Check if servers are responding
+echo "🔍 Checking server health..."
+if curl -s http://localhost:5001/api/health > /dev/null 2>&1; then
+    echo "✅ Backend server is responding"
+else
+    echo "⚠️  Backend server may still be starting..."
+fi
+
+if curl -s http://localhost:5175 > /dev/null 2>&1; then
+    echo "✅ Frontend server is responding"
+else
+    echo "⚠️  Frontend server may still be starting..."
+fi
+
 echo ""
 
 # Wait for background processes
