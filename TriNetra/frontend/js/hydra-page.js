@@ -1,7 +1,7 @@
 // HYDRA Page Application
 import api from './api.js';
 import EnhancedHydraAI from './hydra-enhanced.js';
-import geminiAPI from './gemini-api.js';
+import aiClient from './ai-api.js';
 
 class HydraPage {
     constructor() {
@@ -12,7 +12,7 @@ class HydraPage {
             totalBattles: 0,
             detectionRate: 0
         };
-        this.geminiAnalysis = [];
+        this.aiAnalysis = [];
         this.init();
     }
 
@@ -269,7 +269,7 @@ class HydraPage {
         button.disabled = true;
 
         try {
-            // Call real Gemini API for battle analysis with fallback
+            // Call real AI backend for battle analysis with fallback
             const battleData = {
                 defenderWins: this.battleMetrics.defenderWins,
                 attackerWins: this.battleMetrics.attackerWins,
@@ -279,9 +279,9 @@ class HydraPage {
             
             let aiResponse;
             try {
-                aiResponse = await geminiAPI.analyzeBattleMetrics(battleData);
+                aiResponse = await aiClient.analyzeBattleMetrics(battleData);
             } catch (error) {
-                console.warn('Gemini API failed, using mock analysis:', error);
+                console.warn('AI backend failed, using mock analysis:', error);
                 // Use mock data if API fails
                 aiResponse = {
                     insights: `Current detection rate of ${this.battleMetrics.detectionRate}% indicates ${this.getEfficiencyRating()} performance. The AI defender shows strong pattern recognition capabilities with consistent improvement over battle rounds.`
@@ -403,11 +403,11 @@ class HydraPage {
         }
     }
 
-    async callGeminiAPI(analysisType) {
-        // Simulate Gemini API call
+    async callAIBackend(analysisType) {
+        // Simulate AI backend call
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        const mockGeminiResponse = {
+        const mockAIResponse = {
             analysis_type: analysisType,
             confidence: 0.932,
             battle_analysis: {
@@ -423,8 +423,8 @@ class HydraPage {
             ]
         };
 
-        this.geminiAnalysis.push(mockGeminiResponse);
-        return mockGeminiResponse;
+        this.aiAnalysis.push(mockAIResponse);
+        return mockAIResponse;
     }
 
     getEfficiencyRating() {
@@ -462,7 +462,7 @@ class HydraPage {
                 title: 'HYDRA AI Battle Report',
                 generated_at: new Date().toISOString(),
                 battle_metrics: this.battleMetrics,
-                gemini_analysis: this.geminiAnalysis,
+                ai_analysis: this.aiAnalysis,
                 summary: {
                     total_battles: this.battleMetrics.totalBattles,
                     detection_rate: this.battleMetrics.detectionRate + '%',

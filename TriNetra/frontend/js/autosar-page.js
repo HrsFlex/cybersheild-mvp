@@ -2,12 +2,12 @@
 import api from './api.js';
 import AutoSAR from './autosar-enhanced.js';
 import { initSarMap } from './sar-map.js';
-import geminiAPI from './gemini-api.js';
+import aiClient from './ai-api.js';
 
 class AutoSARPage {
     constructor() {
         this.autosar = null;
-        this.geminiEnhancements = [];
+        this.aiEnhancements = [];
         this.currentReport = null;
         this.init();
     }
@@ -109,11 +109,11 @@ class AutoSARPage {
     }
 
 
-    async callGeminiAPI(analysisType) {
-        // Simulate Gemini API call
+    async callAIBackend(analysisType) {
+        // Simulate AI backend call
         await new Promise(resolve => setTimeout(resolve, 2500));
         
-        const mockGeminiResponse = {
+        const mockAIResponse = {
             analysis_type: analysisType,
             confidence: 0.947,
             enhancement_level: 'advanced',
@@ -129,8 +129,8 @@ class AutoSARPage {
             ]
         };
 
-        this.geminiEnhancements.push(mockGeminiResponse);
-        return mockGeminiResponse;
+        this.aiEnhancements.push(mockAIResponse);
+        return mockAIResponse;
     }
 
     async generateSARReport() {
@@ -221,7 +221,7 @@ class AutoSARPage {
                                 pattern consistent with layering money laundering techniques.
                             </p>
                             <p>
-                                Our Gemini AI enhancement identified this pattern as having 94.7% similarity to known criminal 
+                                Our AI enhancement identified this pattern as having 94.7% similarity to known criminal 
                                 organization financial operations, specifically patterns associated with trade-based money laundering 
                                 schemes. Immediate regulatory action is recommended.
                             </p>

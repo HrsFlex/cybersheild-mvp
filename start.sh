@@ -48,16 +48,26 @@ fi
 echo "🔄 Starting backend server..."
 cd backend
 
-# Activate virtual environment and start backend
-if [ -d "venv" ]; then
+# Create virtual environment and install dependencies if needed
+if [ ! -d "venv" ]; then
+    echo "🔄 Creating virtual environment..."
+    python3 -m venv venv
     source venv/bin/activate
-    python app.py &
-    BACKEND_PID=$!
-    echo "✅ Backend started (PID: $BACKEND_PID) - http://localhost:5001"
+    pip install -r ../requirements.txt
 else
-    echo "❌ Virtual environment not found. Please run: cd backend && python -m venv venv && source venv/bin/activate && pip install -r requirements.txt"
-    exit 1
+    source venv/bin/activate
 fi
+
+# Prompt for a Groq API key on first run (used for AI-enhanced insights)
+if [ ! -f ".env" ]; then
+    echo "🔑 TriNetra uses Groq for AI-enhanced insights. Get a free key at https://console.groq.com/keys"
+    read -p "   Paste your Groq API key (or press Enter to skip / use demo mode): " GROQ_KEY
+    echo "GROQ_API_KEY=${GROQ_KEY}" > .env
+fi
+
+python app.py &
+BACKEND_PID=$!
+echo "✅ Backend started (PID: $BACKEND_PID) - http://localhost:5001"
 
 cd ..
 
@@ -94,7 +104,7 @@ echo "⚙️  Backend:  http://localhost:5001"
 echo "❤️  Health:   http://localhost:5001/api/health"
 echo ""
 echo "📱 Login Page:   http://localhost:5175/login.html"
-echo "🏠 Dashboard:    http://localhost:5175/dashboard.html"
+echo "🏠 Dashboard:    http://localhost:5175/chronos.html"
 echo ""
 echo "⚡ Features Available:"
 echo "   🕐 CHRONOS Timeline Analysis"

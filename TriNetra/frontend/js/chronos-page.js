@@ -1,12 +1,12 @@
 // CHRONOS Page Application
 import api from './api.js';
 import ChronosTimeline from './chronos.js';
-import geminiAPI from './gemini-api.js';
+import aiClient from './ai-api.js';
 
 class ChronosPage {
     constructor() {
         this.chronos = null;
-        this.geminiInsights = [];
+        this.aiInsights = [];
         this.analysisData = {
             suspiciousTransactions: 0,
             suspiciousAccounts: 0,
@@ -337,7 +337,7 @@ class ChronosPage {
         button.disabled = true;
 
         try {
-            // Call real Gemini API for enhanced insights
+            // Call real AI backend for enhanced insights
             const analysisData = {
                 totalTransactions: 150,
                 suspiciousCount: 23,
@@ -346,7 +346,7 @@ class ChronosPage {
                 patterns: ['structuring', 'layering', 'cross-border']
             };
             
-            const aiResponse = await geminiAPI.enhanceFinancialAnalysis(analysisData);
+            const aiResponse = await aiClient.enhanceFinancialAnalysis(analysisData);
             
             const insightsPanel = document.getElementById('ai-insights');
             insightsPanel.innerHTML = `
@@ -545,12 +545,12 @@ class ChronosPage {
         }
     }
 
-    async callGeminiAPI(analysisType) {
-        // Simulate Gemini API call with realistic delay
+    async callAIBackend(analysisType) {
+        // Simulate AI backend call with realistic delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // In a real implementation, this would call the actual Gemini API
-        const mockGeminiResponse = {
+        // In a real implementation, this would call the actual AI backend
+        const mockAIResponse = {
             analysis_type: analysisType,
             confidence: 0.943,
             insights: [
@@ -565,8 +565,8 @@ class ChronosPage {
             ]
         };
 
-        this.geminiInsights.push(mockGeminiResponse);
-        return mockGeminiResponse;
+        this.aiInsights.push(mockAIResponse);
+        return mockAIResponse;
     }
 
     async exportReport() {

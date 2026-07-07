@@ -176,24 +176,33 @@ class TriNetraDataGenerator:
         conn.close()
 
 def init_database():
-    """Initialize database with synthetic data"""
+    """Initialize database with synthetic data, regenerating it if the
+    existing data has aged out of CHRONOS's default (30-day) timeline view."""
     from config import Config
-    
+
     generator = TriNetraDataGenerator(Config.DATABASE_PATH)
     generator.create_tables()
-    
-    # Only populate if database is empty
+
     conn = sqlite3.connect(Config.DATABASE_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM transactions")
-    count = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*), MAX(timestamp) FROM transactions")
+    count, max_timestamp = cursor.fetchone()
     conn.close()
-    
-    if count == 0:
-        print("🔄 Initializing TriNetra database...")
+
+    needs_regeneration = count == 0
+    if not needs_regeneration and max_timestamp:
+        try:
+            latest = datetime.fromisoformat(max_timestamp)
+            if (datetime.now() - latest).days > 60:
+                needs_regeneration = True
+        except ValueError:
+            pass
+
+    if needs_regeneration:
+        print("🔄 Generating fresh TriNetra demo data (existing data was empty or stale)...")
         generator.populate_database()
     else:
-        print(f"✅ Database already contains {count} transactions")
+        print(f"✅ Database already contains {count} recent transactions")
 
 if __name__ == "__main__":
     # Test data generation

@@ -1,2 +1,18 @@
 CLAUDE.md
 .vercel
+
+# Environment / secrets
+.env
+TriNetra/backend/.env
+
+# Python
+TriNetra/backend/venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Editor/OS
+.vscode/
+Thumbs.db
