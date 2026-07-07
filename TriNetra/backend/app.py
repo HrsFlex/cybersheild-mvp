@@ -3,13 +3,24 @@ from flask_cors import CORS
 import os
 import sys
 
+# Windows consoles default to a codepage (e.g. cp1252) that can't encode the
+# emoji used in this app's log messages, which crashes every print() call.
+# Force UTF-8 stdout/stderr so startup and request logging never crash.
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(__file__))
 
 from config import Config
 from api.chronos_api import chronos_bp
-from api.hydra_api import hydra_bp  
+from api.hydra_api import hydra_bp
 from api.autosar_api import autosar_bp
+from api.ai_api import ai_bp
 from data.synthetic_generator import init_database
 
 def create_app():
@@ -23,6 +34,7 @@ def create_app():
     app.register_blueprint(chronos_bp, url_prefix='/api/chronos')
     app.register_blueprint(hydra_bp, url_prefix='/api/hydra')
     app.register_blueprint(autosar_bp, url_prefix='/api/autosar')
+    app.register_blueprint(ai_bp, url_prefix='/api/ai')
     
     # Serve frontend static files
     @app.route('/')
