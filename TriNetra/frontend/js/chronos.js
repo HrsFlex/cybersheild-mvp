@@ -24,11 +24,14 @@ class ChronosTimeline {
         this.networkLinks = [];
         this.searchResults = []; // Store search results
         this.searchModal = null; // Search results modal
-        
+        this.geoMap = null; // Leaflet map instance
+        this.geoMapMarkers = null; // Layer group holding current markers
+
         this.setupTimeline();
         this.setupControls();
         this.setupSearchModal();
         this.setupNetworkOverview();
+        this.initGeoMap();
     }
 
     setupTimeline() {
@@ -38,50 +41,14 @@ class ChronosTimeline {
         // Add explanation panel first
         const container = d3.select(`#${this.containerId}`);
         
-        // Add CHRONOS explanation
+        // Add compact CHRONOS header + call-to-action (trimmed from a large
+        // static 4-card explainer that just duplicated the real controls below)
         container.append('div')
-            .attr('class', 'chronos-explanation bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-8 border border-primary/20 mb-8 shadow-xl')
+            .attr('class', 'chronos-explanation bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/20 mb-8 shadow-xl text-center')
             .html(`
-                <div class="explanation-header text-center mb-8">
-                    <h4 class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">📊 CHRONOS: Transaction Timeline Analysis</h4>
-                    <p class="text-xl text-gray-300 mb-6 leading-relaxed">Interactive time-based visualization of financial transactions and patterns with advanced AI-powered detection.</p>
-                    <div class="bg-primary/20 border border-primary/40 rounded-xl p-4 inline-block">
-                        <p class="start-instruction text-lg font-bold text-primary">👆 <strong>Click Play to start the timeline animation</strong></p>
-                    </div>
-                </div>
-                <div class="explanation-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-green-400/20 hover:border-green-400/50 transition-all duration-300 hover:transform hover:scale-105">
-                        <div class="text-center mb-4">
-                            <span class="emoji text-4xl block mb-2">🎬</span>
-                            <strong class="text-green-400 text-lg block mb-2">Time-Lapse Animation</strong>
-                        </div>
-                        <p class="text-gray-300 text-sm leading-relaxed">Watch transactions unfold chronologically over time with smooth animations and real-time pattern detection.</p>
-                    </div>
-                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-red-400/20 hover:border-red-400/50 transition-all duration-300 hover:transform hover:scale-105">
-                        <div class="text-center mb-4">
-                            <span class="emoji text-4xl block mb-2">🔴</span>
-                            <strong class="text-red-400 text-lg block mb-2">Risk Indicators</strong>
-                        </div>
-                        <p class="text-gray-300 text-sm leading-relaxed">
-                            <span class="text-red-400 font-semibold">Red</span> = High suspicion, 
-                            <span class="text-yellow-400 font-semibold">Yellow</span> = Medium risk, 
-                            <span class="text-blue-400 font-semibold">Blue</span> = Normal transactions
-                        </p>
-                    </div>
-                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-yellow-400/20 hover:border-yellow-400/50 transition-all duration-300 hover:transform hover:scale-105">
-                        <div class="text-center mb-4">
-                            <span class="emoji text-4xl block mb-2">⚡</span>
-                            <strong class="text-yellow-400 text-lg block mb-2">Speed Control</strong>
-                        </div>
-                        <p class="text-gray-300 text-sm leading-relaxed">Adjust animation speed from 0.25x to 4x for detailed forensic analysis and pattern identification.</p>
-                    </div>
-                    <div class="explanation-item bg-dark/40 rounded-xl p-6 border border-purple-400/20 hover:border-purple-400/50 transition-all duration-300 hover:transform hover:scale-105">
-                        <div class="text-center mb-4">
-                            <span class="emoji text-4xl block mb-2">🔍</span>
-                            <strong class="text-purple-400 text-lg block mb-2">Interactive Details</strong>
-                        </div>
-                        <p class="text-gray-300 text-sm leading-relaxed">Hover over transactions to see detailed information, risk scores, and ML-powered insights.</p>
-                    </div>
+                <h4 class="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">📊 CHRONOS: Transaction Timeline Analysis</h4>
+                <div class="bg-primary/20 border border-primary/40 rounded-xl p-3 inline-block mt-2">
+                    <p class="start-instruction text-base font-bold text-primary">👆 <strong>Click Play to start the timeline animation</strong></p>
                 </div>
             `);
         
@@ -230,39 +197,80 @@ class ChronosTimeline {
                 </div>
             `);
             
-        // Add keyboard shortcuts
+        // Add live transaction geography map (replaces the old static
+        // keyboard-shortcuts panel with something that actually uses the data)
         container.append('div')
-            .attr('class', 'shortcuts-info bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-2xl p-8 border border-purple-400/20 shadow-lg')
+            .attr('class', 'geo-map-panel bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-2xl p-8 border border-purple-400/20 shadow-lg')
             .html(`
-                <div class="text-center mb-6">
-                    <h6 class="text-2xl font-bold text-purple-400 mb-4 flex items-center justify-center">
-                        ⌨️ Keyboard Controls
-                        <span class="ml-3 text-sm bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full">Pro Tips</span>
+                <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <h6 class="text-2xl font-bold text-purple-400 flex items-center">
+                        🗺️ Transaction Geography
+                        <span class="ml-3 text-sm bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full">Live</span>
                     </h6>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-green-400/20 hover:border-green-400/50 transition-all">
-                        <kbd class="bg-green-500/20 text-green-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">Space</kbd>
-                        <span class="text-gray-300 text-sm">Play/Pause</span>
-                    </div>
-                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-red-400/20 hover:border-red-400/50 transition-all">
-                        <kbd class="bg-red-500/20 text-red-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">R</kbd>
-                        <span class="text-gray-300 text-sm">Reset</span>
-                    </div>
-                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-blue-400/20 hover:border-blue-400/50 transition-all">
-                        <kbd class="bg-blue-500/20 text-blue-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">T</kbd>
-                        <span class="text-gray-300 text-sm">Timeline View</span>
-                    </div>
-                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-yellow-400/20 hover:border-yellow-400/50 transition-all">
-                        <kbd class="bg-yellow-500/20 text-yellow-400 px-3 py-2 rounded-lg font-bold text-lg block mb-2">N</kbd>
-                        <span class="text-gray-300 text-sm">Network View</span>
-                    </div>
-                    <div class="bg-dark/40 rounded-xl p-4 text-center border border-purple-400/20 hover:border-purple-400/50 transition-all">
-                        <kbd class="bg-purple-500/20 text-purple-400 px-2 py-2 rounded-lg font-bold text-sm block mb-2">Ctrl+F</kbd>
-                        <span class="text-gray-300 text-sm">Search</span>
+                    <div class="flex items-center gap-4 text-sm text-gray-300">
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-[#ff1744] inline-block mr-2"></span>Critical</span>
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-[#ff9800] inline-block mr-2"></span>Suspicious</span>
+                        <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-[#00d4ff] inline-block mr-2"></span>Normal</span>
                     </div>
                 </div>
+                <div id="chronos-geo-map" style="height: 420px; width: 100%; border-radius: 12px; border: 2px solid rgba(147, 51, 234, 0.4);"></div>
+                <p class="text-sm text-gray-400 mt-3">Plotting the currently loaded transactions by origin location. Hover a marker for details.</p>
             `);
+    }
+
+    initGeoMap() {
+        if (typeof L === 'undefined') {
+            console.warn('⚠️ CHRONOS: Leaflet not loaded, skipping geography map');
+            return;
+        }
+        const mapEl = document.getElementById('chronos-geo-map');
+        if (!mapEl) return;
+
+        this.geoMap = L.map('chronos-geo-map', { minZoom: 2, maxZoom: 10 }).setView([20.5937, 78.9629], 3);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; CARTO'
+        }).addTo(this.geoMap);
+
+        this.geoMapMarkers = L.layerGroup().addTo(this.geoMap);
+        this.updateGeoMap();
+    }
+
+    updateGeoMap() {
+        if (!this.geoMap || !this.geoMapMarkers) return;
+        this.geoMapMarkers.clearLayers();
+
+        const points = this.data.filter(d => {
+            const loc = d.aadhar_location;
+            return loc && loc.lat && loc.lng && (loc.lat !== 0 || loc.lng !== 0);
+        });
+
+        points.forEach(tx => {
+            const loc = tx.aadhar_location;
+            let color = '#00d4ff'; // normal
+            if (tx.suspicious_score > 0.8) color = '#ff1744'; // critical
+            else if (tx.suspicious_score > 0.5) color = '#ff9800'; // suspicious
+
+            const marker = L.circleMarker([loc.lat, loc.lng], {
+                radius: 6,
+                color,
+                fillColor: color,
+                fillOpacity: 0.75,
+                weight: 1.5
+            }).bindPopup(`
+                <b>Transaction:</b> ${tx.id || tx.transaction_id}<br>
+                <b>Location:</b> ${loc.city || 'Unknown'}, ${loc.country || ''}<br>
+                <b>Amount:</b> ${formatCurrency(tx.amount)}<br>
+                <b>Suspicion Score:</b> ${(tx.suspicious_score * 100).toFixed(0)}%
+            `);
+
+            this.geoMapMarkers.addLayer(marker);
+        });
+
+        if (points.length > 0) {
+            const bounds = L.latLngBounds(points.map(tx => [tx.aadhar_location.lat, tx.aadhar_location.lng]));
+            this.geoMap.fitBounds(bounds.pad(0.3));
+        }
     }
 
     setupSearchModal() {
@@ -1390,6 +1398,9 @@ class ChronosTimeline {
                 <p>No transaction data found for the selected scenario. Please try a different filter or check the data source.</p>
             `);
         }
+        if (this.geoMapMarkers) {
+            this.geoMapMarkers.clearLayers();
+        }
     }
 
     render() {
@@ -1400,6 +1411,7 @@ class ChronosTimeline {
 
         // Update status bar
         this.updateStatusBar();
+        this.updateGeoMap();
 
         // Clear any existing content first (important for view switching)
         this.g.selectAll('*').remove();

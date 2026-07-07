@@ -4,6 +4,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import json
 import os
+import random
 from faker import Faker
 
 fake = Faker()
@@ -52,6 +53,20 @@ class TriNetraDataGenerator:
         conn.commit()
         conn.close()
     
+    def _weighted_days_ago(self):
+        """Pick how many days ago a transaction happened, skewed towards
+        recent activity but spread across the full 3-year CHRONOS window so
+        the 1m/6m/1y/3y timeline filters actually show different data."""
+        r = random.random()
+        if r < 0.40:
+            return random.uniform(0, 30)
+        elif r < 0.65:
+            return random.uniform(30, 180)
+        elif r < 0.85:
+            return random.uniform(180, 365)
+        else:
+            return random.uniform(365, 1095)
+
     def generate_scenario_data(self, scenario_name, num_transactions=100):
         """Generate synthetic data for specific scenarios"""
         scenarios = {
@@ -68,86 +83,82 @@ class TriNetraDataGenerator:
     def _generate_terrorist_financing(self, num_transactions):
         """Generate terrorist financing scenario"""
         transactions = []
-        base_time = datetime.now() - timedelta(days=30)
         target_account = "TERROR_CELL_001"
-        
+
         for i in range(num_transactions):
             transaction = {
                 'transaction_id': f'TF_{i:04d}',
                 'from_account': f'DONOR_{i % 50:03d}',
                 'to_account': target_account if i % 3 == 0 else f'SHELL_{i % 10:02d}',
                 'amount': np.random.uniform(50, 500),  # Small amounts
-                'timestamp': (base_time + timedelta(hours=i)).isoformat(),
+                'timestamp': (datetime.now() - timedelta(days=self._weighted_days_ago())).isoformat(),
                 'transaction_type': 'transfer',
                 'suspicious_score': np.random.uniform(0.6, 0.9),
                 'pattern_type': 'micro_donations',
                 'scenario': 'terrorist_financing'
             }
             transactions.append(transaction)
-        
+
         return transactions
-    
+
     def _generate_crypto_sanctions(self, num_transactions):
         """Generate crypto sanctions evasion scenario"""
         transactions = []
-        base_time = datetime.now() - timedelta(days=7)
-        
+
         for i in range(num_transactions):
             transaction = {
                 'transaction_id': f'CS_{i:04d}',
                 'from_account': f'WALLET_{i % 20:03d}',
                 'to_account': f'MIXER_{i % 5:02d}' if i % 4 == 0 else f'EXCHANGE_{i % 8:02d}',
                 'amount': np.random.uniform(1000, 50000),
-                'timestamp': (base_time + timedelta(hours=i*2)).isoformat(),
+                'timestamp': (datetime.now() - timedelta(days=self._weighted_days_ago())).isoformat(),
                 'transaction_type': 'crypto_transfer',
                 'suspicious_score': np.random.uniform(0.7, 0.95),
                 'pattern_type': 'layering',
                 'scenario': 'crypto_sanctions'
             }
             transactions.append(transaction)
-        
+
         return transactions
-    
+
     def _generate_human_trafficking(self, num_transactions):
         """Generate human trafficking network scenario"""
         transactions = []
-        base_time = datetime.now() - timedelta(days=60)
-        
+
         for i in range(num_transactions):
             transaction = {
                 'transaction_id': f'HT_{i:04d}',
                 'from_account': f'FRONT_BUSINESS_{i % 15:02d}',
                 'to_account': f'HANDLER_{i % 8:02d}',
                 'amount': np.random.uniform(2000, 15000),
-                'timestamp': (base_time + timedelta(hours=i*6)).isoformat(),
+                'timestamp': (datetime.now() - timedelta(days=self._weighted_days_ago())).isoformat(),
                 'transaction_type': 'cash_transfer',
                 'suspicious_score': np.random.uniform(0.5, 0.8),
                 'pattern_type': 'network_distribution',
                 'scenario': 'human_trafficking'
             }
             transactions.append(transaction)
-        
+
         return transactions
-    
+
     def _generate_random_transactions(self, num_transactions):
         """Generate normal transactions for baseline"""
         transactions = []
-        base_time = datetime.now() - timedelta(days=30)
-        
+
         for i in range(num_transactions):
             transaction = {
                 'transaction_id': f'NORM_{i:04d}',
                 'from_account': fake.iban(),
                 'to_account': fake.iban(),
                 'amount': np.random.uniform(100, 10000),
-                'timestamp': (base_time + timedelta(hours=i)).isoformat(),
+                'timestamp': (datetime.now() - timedelta(days=self._weighted_days_ago())).isoformat(),
                 'transaction_type': 'transfer',
                 'suspicious_score': np.random.uniform(0.1, 0.3),
                 'pattern_type': 'normal',
                 'scenario': 'baseline'
             }
             transactions.append(transaction)
-        
+
         return transactions
     
     def populate_database(self):
