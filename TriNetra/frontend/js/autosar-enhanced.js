@@ -92,34 +92,6 @@ class EnhancedAutoSAR {
                     </div>
                 </div>
 
-                <!-- Quick Analysis Panel -->
-                <div class="quick-analysis-panel">
-                    <div class="analysis-card">
-                        <div class="card-icon">📊</div>
-                        <div class="card-content">
-                            <h4>Pattern Detection</h4>
-                            <p>Real-time ML pattern analysis</p>
-                            <div class="accuracy-badge">94.7% Accuracy</div>
-                        </div>
-                    </div>
-                    <div class="analysis-card">
-                        <div class="card-icon">🎯</div>
-                        <div class="card-content">
-                            <h4>Risk Assessment</h4>
-                            <p>Neural network risk scoring</p>
-                            <div class="accuracy-badge">97.2% Accuracy</div>
-                        </div>
-                    </div>
-                    <div class="analysis-card">
-                        <div class="card-icon">⚖️</div>
-                        <div class="card-content">
-                            <h4>Compliance Check</h4>
-                            <p>Regulatory validation engine</p>
-                            <div class="accuracy-badge">99.1% Accuracy</div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Advanced Controls -->
                 <div class="advanced-controls">
                     <div class="control-section">
@@ -167,26 +139,7 @@ class EnhancedAutoSAR {
                             </div>
                         </div>
                         <h3>🚀 Enhanced AI-Powered SAR Generator</h3>
-                        <p>Advanced machine learning analysis for comprehensive suspicious activity detection</p>
-                        
-                        <div class="feature-highlights">
-                            <div class="feature-item">
-                                <span class="feature-icon">🤖</span>
-                                <span class="feature-text">AI Pattern Recognition</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="feature-icon">📈</span>
-                                <span class="feature-text">Real-time Risk Scoring</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="feature-icon">⚡</span>
-                                <span class="feature-text">Instant Compliance Validation</span>
-                            </div>
-                            <div class="feature-item">
-                                <span class="feature-icon">📊</span>
-                                <span class="feature-text">Interactive Analytics</span>
-                            </div>
-                        </div>
+                        <p>Click "Start AI Analysis" to detect patterns, or "Generate SAR Report" to build a report directly.</p>
 
                         <div class="action-buttons">
                             <button class="primary-action-btn" onclick="window.TriNetra.getAutoSAR().performAIAnalysis()">
@@ -1369,59 +1322,6 @@ class EnhancedAutoSAR {
                 50% { opacity: 0.7; transform: scale(1.2); }
             }
 
-            .quick-analysis-panel {
-                position: relative;
-                z-index: 1;
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 1.5rem;
-                margin-bottom: 2rem;
-            }
-
-            .analysis-card {
-                background: rgba(16, 33, 62, 0.8);
-                border-radius: 16px;
-                padding: 1.5rem;
-                border: 1px solid rgba(0, 255, 135, 0.2);
-                transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .analysis-card:hover {
-                transform: translateY(-5px);
-                border-color: rgba(0, 255, 135, 0.5);
-                box-shadow: 0 10px 30px rgba(0, 255, 135, 0.2);
-            }
-
-            .analysis-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 3px;
-                background: linear-gradient(90deg, #00ff87, #00d4ff);
-                opacity: 0.8;
-            }
-
-            .card-icon {
-                font-size: 2.5rem;
-                margin-bottom: 1rem;
-                display: block;
-            }
-
-            .accuracy-badge {
-                background: linear-gradient(135deg, #00ff87, #00d4ff);
-                color: #1a1a2e;
-                padding: 0.25rem 0.75rem;
-                border-radius: 20px;
-                font-size: 0.8rem;
-                font-weight: 600;
-                margin-top: 0.5rem;
-                display: inline-block;
-            }
-
             .advanced-controls {
                 position: relative;
                 z-index: 1;
@@ -1499,27 +1399,6 @@ class EnhancedAutoSAR {
             @keyframes neuronFire {
                 0%, 100% { opacity: 0.3; transform: scale(1); }
                 50% { opacity: 1; transform: scale(1.5); }
-            }
-
-            .feature-highlights {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 1rem;
-                margin: 2rem 0;
-            }
-
-            .feature-item {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.75rem;
-                background: rgba(0, 255, 135, 0.1);
-                border-radius: 8px;
-                border: 1px solid rgba(0, 255, 135, 0.2);
-            }
-
-            .feature-icon {
-                font-size: 1.5rem;
             }
 
             .action-buttons {
@@ -2006,7 +1885,6 @@ class EnhancedAutoSAR {
                     padding: 1rem;
                 }
 
-                .quick-analysis-panel,
                 .advanced-controls,
                 .key-insights {
                     grid-template-columns: 1fr;
@@ -2902,39 +2780,10 @@ class EnhancedAutoSAR {
                     `).join('')}
                 </div>
 
-                <!-- Enhanced Process Explanation -->
-                <div class="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl p-8 border border-indigo-500/20 mb-8">
-                    <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-xl">🔬</div>
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Advanced Validation Methodology</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm text-gray-300">
-                        <div class="bg-dark/30 rounded-xl p-4 border border-indigo-500/20">
-                            <div class="text-indigo-400 font-semibold mb-2">🧠 1. AI Pattern Analysis</div>
-                            <p>Deep learning algorithms analyze financial patterns against 15,000+ regulatory scenarios with 97.2% accuracy.</p>
-                        </div>
-                        <div class="bg-dark/30 rounded-xl p-4 border border-purple-500/20">
-                            <div class="text-purple-400 font-semibold mb-2">⚖️ 2. Multi-Framework Assessment</div>
-                            <p>Cross-validation against BSA/AML, FATF, FinCEN, and international regulatory frameworks with weighted scoring.</p>
-                        </div>
-                        <div class="bg-dark/30 rounded-xl p-4 border border-pink-500/20">
-                            <div class="text-pink-400 font-semibold mb-2">📊 3. Real-time Risk Scoring</div>
-                            <p>Dynamic risk assessment using ensemble models with continuous learning and adaptation capabilities.</p>
-                        </div>
-                        <div class="bg-dark/30 rounded-xl p-4 border border-blue-500/20">
-                            <div class="text-blue-400 font-semibold mb-2">🔍 4. Data Integrity Validation</div>
-                            <p>Comprehensive data quality checks including completeness, accuracy, consistency, and temporal validation.</p>
-                        </div>
-                        <div class="bg-dark/30 rounded-xl p-4 border border-green-500/20">
-                            <div class="text-green-400 font-semibold mb-2">🎯 5. Compliance Mapping</div>
-                            <p>Automated mapping to specific regulatory requirements with severity classification and remediation guidance.</p>
-                        </div>
-                        <div class="bg-dark/30 rounded-xl p-4 border border-orange-500/20">
-                            <div class="text-orange-400 font-semibold mb-2">📈 6. Continuous Monitoring</div>
-                            <p>Real-time compliance monitoring with alert systems and automated reporting for regulatory bodies.</p>
-                        </div>
-                    </div>
+                <!-- Methodology Note -->
+                <div class="bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl p-5 border border-indigo-500/20 mb-8 flex items-center space-x-4">
+                    <div class="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white text-lg">🔬</div>
+                    <p class="text-sm text-gray-300">Scored against BSA/AML, FATF, and FinCEN frameworks using AI pattern analysis, risk scoring, and data integrity checks.</p>
                 </div>
 
                 <!-- Action Buttons -->

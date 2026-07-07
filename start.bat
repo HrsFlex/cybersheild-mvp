@@ -57,13 +57,23 @@ if errorlevel 1 (
 
 if not exist "%BACKEND%\.env" (
     echo [3/5] No .env file found for the backend.
-    echo         TriNetra uses Groq for AI-enhanced insights. Get a free key at:
-    echo         https://console.groq.com/keys
-    set /p GROQ_KEY="        Paste your Groq API key now (or press Enter to skip / use demo mode): "
-    (
-        echo GROQ_API_KEY=!GROQ_KEY!
-    ) > "%BACKEND%\.env"
-    if "!GROQ_KEY!"=="" (
+    echo         TriNetra can use OpenAI or OpenRouter for AI-enhanced insights.
+    echo         OpenAI:     https://platform.openai.com/api-keys
+    echo         OpenRouter: https://openrouter.ai/keys
+    set "LLM_PROVIDER_INPUT="
+    set /p LLM_PROVIDER_INPUT="        Which provider? [openai/openrouter] (default: openai): "
+    if "!LLM_PROVIDER_INPUT!"=="" set "LLM_PROVIDER_INPUT=openai"
+    set "LLM_KEY_INPUT="
+    set /p LLM_KEY_INPUT="        Paste your API key now (or press Enter to skip / use demo mode): "
+
+    echo LLM_PROVIDER=!LLM_PROVIDER_INPUT!> "%BACKEND%\.env"
+    if /i "!LLM_PROVIDER_INPUT!"=="openrouter" (
+        echo OPENROUTER_API_KEY=!LLM_KEY_INPUT!>> "%BACKEND%\.env"
+    ) else (
+        echo OPENAI_API_KEY=!LLM_KEY_INPUT!>> "%BACKEND%\.env"
+    )
+
+    if "!LLM_KEY_INPUT!"=="" (
         echo         Skipped - the app will use built-in mock AI responses.
         echo         You can add a key later by editing "%BACKEND%\.env"
     ) else (
@@ -87,9 +97,26 @@ start "TriNetra Backend" cmd /k "cd /d "%BACKEND%" && call venv\Scripts\activate
 start "TriNetra Frontend" cmd /k "cd /d "%FRONTEND%" && npm run dev"
 
 echo.
-echo Waiting for servers to come up...
-timeout /t 6 /nobreak >nul
+echo Waiting for the backend to come up (this avoids opening the browser too early)...
+set "BACKEND_READY=0"
+for /l %%i in (1,1,45) do (
+    curl -s -o nul -m 1 http://localhost:5001/api/health
+    if not errorlevel 1 (
+        set "BACKEND_READY=1"
+        goto backend_ready
+    )
+    timeout /t 1 /nobreak >nul
+)
+:backend_ready
+if "!BACKEND_READY!"=="1" (
+    echo Backend is up.
+) else (
+    echo [WARN] Backend did not respond within 45 seconds.
+    echo         Check the "TriNetra Backend" window for errors before using the app.
+)
 
+REM Give the frontend dev server a moment too before opening the browser
+timeout /t 2 /nobreak >nul
 start "" "http://localhost:5175/login.html"
 
 echo.

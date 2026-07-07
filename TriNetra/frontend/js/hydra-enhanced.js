@@ -255,16 +255,6 @@ class EnhancedHydraAI {
                     </div>
                 </div>
                 
-                <!-- Battle Instructions -->
-                <div class="battle-instructions">
-                    <div class="instruction-card">
-                        <h4>🎯 How HYDRA Works</h4>
-                        <p><strong>AI Defender:</strong> Protects against financial crime by detecting suspicious patterns</p>
-                        <p><strong>AI Attacker:</strong> Generates new adversarial patterns to test defenses</p>
-                        <p><strong>Battle Mode:</strong> Watch AI systems compete to improve detection capabilities</p>
-                    </div>
-                </div>
-                
                 <!-- Enhanced Battle Log with Real-time Stats -->
                 <div class="enhanced-battle-dashboard">
                     <div class="battle-log-enhanced" id="battle-log-enhanced">

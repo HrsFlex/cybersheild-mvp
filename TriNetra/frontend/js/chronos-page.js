@@ -39,11 +39,8 @@ class ChronosPage {
     }
 
     setupEventListeners() {
-        // Time quantum change
-        document.getElementById('time-quantum').addEventListener('change', async (e) => {
-            const quantum = e.target.value;
-            await this.chronos.setTimeQuantum(quantum);
-        });
+        // Time quantum change is handled inside ChronosTimeline itself
+        // (it already reloads data for the selected period on 'change').
 
         // Search functionality
         document.getElementById('search-button').addEventListener('click', () => {
